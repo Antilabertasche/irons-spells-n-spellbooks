@@ -86,6 +86,8 @@ public class CommonSetup {
         event.put(EntityRegistry.CULTIST.get(), CultistEntity.prepareAttributes().build());
         event.put(EntityRegistry.FIRE_BOSS.get(), FireBossEntity.prepareAttributes().build());
         event.put(EntityRegistry.CURSED_ARMOR_STAND.get(), CursedArmorStandEntity.prepareAttributes().build());
+        //TODO: custom attributes
+        event.put(EntityRegistry.SUMMONED_SWORD.get(), WispEntity.prepareAttributes().build());
     }
 
     @SubscribeEvent

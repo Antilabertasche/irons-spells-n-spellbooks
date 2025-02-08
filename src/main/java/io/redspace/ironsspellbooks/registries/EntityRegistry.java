@@ -196,16 +196,22 @@ public class EntityRegistry {
                     .build(new ResourceLocation(IronsSpellbooks.MODID, "necromancer").toString()));
 
     public static final DeferredHolder<EntityType<?>, EntityType<SummonedZombie>> SUMMONED_ZOMBIE =
-            ENTITIES.register("summoned_zombie", () -> EntityType.Builder.<SummonedZombie>of(SummonedZombie::new, MobCategory.MONSTER)
+            ENTITIES.register("summoned_zombie", () -> EntityType.Builder.<SummonedZombie>of(SummonedZombie::new, MobCategory.MISC)
                     .sized(.6f, 1.8f)
                     .clientTrackingRange(64)
                     .build(new ResourceLocation(IronsSpellbooks.MODID, "summoned_zombie").toString()));
 
     public static final DeferredHolder<EntityType<?>, EntityType<SummonedSkeleton>> SUMMONED_SKELETON =
-            ENTITIES.register("summoned_skeleton", () -> EntityType.Builder.<SummonedSkeleton>of(SummonedSkeleton::new, MobCategory.MONSTER)
+            ENTITIES.register("summoned_skeleton", () -> EntityType.Builder.<SummonedSkeleton>of(SummonedSkeleton::new, MobCategory.MISC)
                     .sized(.6f, 1.8f)
                     .clientTrackingRange(64)
                     .build(new ResourceLocation(IronsSpellbooks.MODID, "summoned_skeleton").toString()));
+
+    public static final DeferredHolder<EntityType<?>, EntityType<SummonedWeaponEntity>> SUMMONED_SWORD =
+            ENTITIES.register("summoned_sword", () -> EntityType.Builder.<SummonedWeaponEntity>of(SummonedWeaponEntity::new, MobCategory.MISC)
+                    .sized(1f, 1f)
+                    .clientTrackingRange(64)
+                    .build(new ResourceLocation(IronsSpellbooks.MODID, "summoned_sword").toString()));
 
     public static final DeferredHolder<EntityType<?>, EntityType<WitherSkullProjectile>> WITHER_SKULL_PROJECTILE =
             ENTITIES.register("wither_skull", () -> EntityType.Builder.<WitherSkullProjectile>of(WitherSkullProjectile::new, MobCategory.MISC)
