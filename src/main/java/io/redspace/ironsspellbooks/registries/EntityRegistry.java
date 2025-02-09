@@ -58,7 +58,7 @@ import io.redspace.ironsspellbooks.entity.spells.root.RootEntity;
 import io.redspace.ironsspellbooks.entity.spells.shield.ShieldEntity;
 import io.redspace.ironsspellbooks.entity.spells.small_magic_arrow.SmallMagicArrow;
 import io.redspace.ironsspellbooks.entity.spells.spectral_hammer.SpectralHammer;
-import io.redspace.ironsspellbooks.entity.spells.summoned_weapons.SummonedWeaponEntity;
+import io.redspace.ironsspellbooks.entity.spells.summoned_weapons.SummonedRapierEntity;
 import io.redspace.ironsspellbooks.entity.spells.sunbeam.SunbeamEntity;
 import io.redspace.ironsspellbooks.entity.spells.target_area.TargetedAreaEntity;
 import io.redspace.ironsspellbooks.entity.spells.thunderstep.ThunderstepProjectile;
@@ -208,11 +208,6 @@ public class EntityRegistry {
                     .clientTrackingRange(64)
                     .build(new ResourceLocation(IronsSpellbooks.MODID, "summoned_skeleton").toString()));
 
-    public static final DeferredHolder<EntityType<?>, EntityType<SummonedWeaponEntity>> SUMMONED_SWORD =
-            ENTITIES.register("summoned_sword", () -> EntityType.Builder.<SummonedWeaponEntity>of(SummonedWeaponEntity::new, MobCategory.MISC)
-                    .sized(1f, 1f)
-                    .clientTrackingRange(64)
-                    .build(new ResourceLocation(IronsSpellbooks.MODID, "summoned_sword").toString()));
 
     public static final DeferredHolder<EntityType<?>, EntityType<WitherSkullProjectile>> WITHER_SKULL_PROJECTILE =
             ENTITIES.register("wither_skull", () -> EntityType.Builder.<WitherSkullProjectile>of(WitherSkullProjectile::new, MobCategory.MISC)
@@ -561,6 +556,11 @@ public class EntityRegistry {
                     .clientTrackingRange(64)
                     .build(new ResourceLocation(IronsSpellbooks.MODID, "thunderstep_orb").toString()));
 
+    public static final DeferredHolder<EntityType<?>, EntityType<SummonedRapierEntity>> SUMMONED_SWORD =
+            ENTITIES.register("summoned_sword", () -> EntityType.Builder.<SummonedRapierEntity>of(SummonedRapierEntity::new, MobCategory.MISC)
+                    .sized(1f, 1f)
+                    .clientTrackingRange(64)
+                    .build(new ResourceLocation(IronsSpellbooks.MODID, "summoned_sword").toString()));
 
 }
 

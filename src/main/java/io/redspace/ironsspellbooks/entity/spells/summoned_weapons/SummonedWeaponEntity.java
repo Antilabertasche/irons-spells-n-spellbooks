@@ -55,10 +55,14 @@ public class SummonedWeaponEntity extends AbstractSpellCastingMob implements IMa
 
     @Override
     protected void registerGoals() {
-        goalSelector.addGoal(1, new GenericAnimatedWarlockAttackGoal<>(this, 1, 30, 50)
+        goalSelector.addGoal(1, new GenericAnimatedWarlockAttackGoal<>(this, 1, 0, 20)
                 .setMoveset(List.of(
-                        new AttackAnimationData(36, "summoned_sword_basic_swing", 20)
-                )));
+                        new AttackAnimationData(36, "summoned_sword_basic_swing", 20),
+                        new AttackAnimationData(52, "summoned_sword_basic_dual_swing", 20, 35),
+                        new AttackAnimationData(40, "summoned_sword_multistab", 20, 26, 32)
+                ))
+                .setMeleeBias(1f, 1f)
+        );
         goalSelector.addGoal(3, new GenericFollowOwnerGoal(this, this::getSummoner, 1, 9, 4, true, 20));
         goalSelector.addGoal(5, new WaterAvoidingRandomFlyingGoal(this, 0.75));
 
@@ -83,9 +87,11 @@ public class SummonedWeaponEntity extends AbstractSpellCastingMob implements IMa
         if (this.tickCount % 8 == 0) {
             //fixme: causes crazy motion, not very constistent
             var owner = getSummoner();
-            var targetY = owner == null ? Utils.moveToRelativeGroundLevel(level, this.position(), 3).y + 1 : owner.getY() + 1;
+            var target = getTarget();
+            var trackEntity = target == null ? owner : target;
+            var targetY = trackEntity == null ? Utils.moveToRelativeGroundLevel(level, this.position(), 3).y + 1 : trackEntity.getY() + 1;
             var f = targetY - getY();
-            var force = f * 0.05;
+            var force = Math.clamp(f * 0.05, -0.15, 0.15);
             this.setDeltaMovement(this.getDeltaMovement().add(0, force, 0));
         }
     }
@@ -179,11 +185,11 @@ public class SummonedWeaponEntity extends AbstractSpellCastingMob implements IMa
     public static AttributeSupplier.Builder prepareAttributes() {
         return LivingEntity.createLivingAttributes()
                 .add(Attributes.ATTACK_KNOCKBACK, 1.0)
-                .add(Attributes.ATTACK_DAMAGE, 3.0)
+                .add(Attributes.ATTACK_DAMAGE, 5.0)
                 .add(Attributes.MAX_HEALTH, 20.0)
                 .add(Attributes.FOLLOW_RANGE, 40.0)
                 .add(Attributes.FLYING_SPEED, 1)
-                .add(Attributes.ENTITY_INTERACTION_RANGE, 3)
+                .add(Attributes.ENTITY_INTERACTION_RANGE, 4)
                 .add(Attributes.MOVEMENT_SPEED, .2);
 
     }
