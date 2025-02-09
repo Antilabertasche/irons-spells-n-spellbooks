@@ -58,6 +58,7 @@ import io.redspace.ironsspellbooks.entity.spells.root.RootEntity;
 import io.redspace.ironsspellbooks.entity.spells.shield.ShieldEntity;
 import io.redspace.ironsspellbooks.entity.spells.small_magic_arrow.SmallMagicArrow;
 import io.redspace.ironsspellbooks.entity.spells.spectral_hammer.SpectralHammer;
+import io.redspace.ironsspellbooks.entity.spells.summoned_weapons.SummonedWeaponEntity;
 import io.redspace.ironsspellbooks.entity.spells.sunbeam.SunbeamEntity;
 import io.redspace.ironsspellbooks.entity.spells.target_area.TargetedAreaEntity;
 import io.redspace.ironsspellbooks.entity.spells.thunderstep.ThunderstepProjectile;

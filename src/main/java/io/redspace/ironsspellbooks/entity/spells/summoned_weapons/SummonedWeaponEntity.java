@@ -1,4 +1,4 @@
-package io.redspace.ironsspellbooks.entity.spells;
+package io.redspace.ironsspellbooks.entity.spells.summoned_weapons;
 
 import io.redspace.ironsspellbooks.api.spells.AbstractSpell;
 import io.redspace.ironsspellbooks.api.util.Utils;
@@ -6,25 +6,32 @@ import io.redspace.ironsspellbooks.entity.mobs.IAnimatedAttacker;
 import io.redspace.ironsspellbooks.entity.mobs.IMagicSummon;
 import io.redspace.ironsspellbooks.entity.mobs.abstract_spell_casting_mob.AbstractSpellCastingMob;
 import io.redspace.ironsspellbooks.entity.mobs.goals.*;
+import io.redspace.ironsspellbooks.entity.mobs.goals.melee.AttackAnimationData;
 import io.redspace.ironsspellbooks.entity.mobs.wizards.GenericAnimatedWarlockAttackGoal;
 import io.redspace.ironsspellbooks.registries.MobEffectRegistry;
 import io.redspace.ironsspellbooks.util.OwnerHelper;
+import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.tags.DamageTypeTags;
+import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.PathfinderMob;
+import net.minecraft.world.entity.*;
+import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.control.FlyingMoveControl;
+import net.minecraft.world.entity.ai.goal.WaterAvoidingRandomFlyingGoal;
 import net.minecraft.world.entity.ai.navigation.FlyingPathNavigation;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.ServerLevelAccessor;
+import net.minecraft.world.level.block.state.BlockState;
 import software.bernie.geckolib.animatable.instance.AnimatableInstanceCache;
+import software.bernie.geckolib.animation.AnimationState;
 import software.bernie.geckolib.animation.*;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
 import javax.annotation.Nullable;
+import java.util.List;
 import java.util.UUID;
 
 public class SummonedWeaponEntity extends AbstractSpellCastingMob implements IMagicSummon, IAnimatedAttacker {
@@ -36,14 +43,24 @@ public class SummonedWeaponEntity extends AbstractSpellCastingMob implements IMa
 
     public SummonedWeaponEntity(EntityType<? extends PathfinderMob> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
-        this.moveControl = new FlyingMoveControl(this, 15, true);
+        this.moveControl = new FlyingMoveControl(this, 20, true);
+    }
+
+    @org.jetbrains.annotations.Nullable
+    @Override
+    public SpawnGroupData finalizeSpawn(ServerLevelAccessor pLevel, DifficultyInstance pDifficulty, MobSpawnType pSpawnType, @org.jetbrains.annotations.Nullable SpawnGroupData pSpawnGroupData) {
         this.setNoGravity(true);
+        return super.finalizeSpawn(pLevel, pDifficulty, pSpawnType, pSpawnGroupData);
     }
 
     @Override
     protected void registerGoals() {
-        goalSelector.addGoal(1, new GenericAnimatedWarlockAttackGoal<>(this, 4, 30, 50, 3));
-        goalSelector.addGoal(5, new GenericFollowOwnerGoal(this, this::getSummoner, 5, 9, 4, true, 20));
+        goalSelector.addGoal(1, new GenericAnimatedWarlockAttackGoal<>(this, 1, 30, 50)
+                .setMoveset(List.of(
+                        new AttackAnimationData(36, "summoned_sword_basic_swing", 20)
+                )));
+        goalSelector.addGoal(3, new GenericFollowOwnerGoal(this, this::getSummoner, 1, 9, 4, true, 20));
+        goalSelector.addGoal(5, new WaterAvoidingRandomFlyingGoal(this, 0.75));
 
         this.targetSelector.addGoal(1, new GenericOwnerHurtByTargetGoal(this, this::getSummoner));
         this.targetSelector.addGoal(2, new GenericOwnerHurtTargetGoal(this, this::getSummoner));
@@ -53,7 +70,11 @@ public class SummonedWeaponEntity extends AbstractSpellCastingMob implements IMa
 
     @Override
     protected PathNavigation createNavigation(Level pLevel) {
-        return new FlyingPathNavigation(this, pLevel);
+        FlyingPathNavigation flyingpathnavigation = new FlyingPathNavigation(this, pLevel);
+        flyingpathnavigation.setCanOpenDoors(false);
+        flyingpathnavigation.setCanFloat(true);
+        flyingpathnavigation.setCanPassDoors(true);
+        return flyingpathnavigation;
     }
 
     @Override
@@ -70,8 +91,7 @@ public class SummonedWeaponEntity extends AbstractSpellCastingMob implements IMa
     }
 
     @Override
-    public boolean causeFallDamage(float pFallDistance, float pMultiplier, DamageSource pSource) {
-        return false;
+    protected void checkFallDamage(double pY, boolean pOnGround, BlockState pState, BlockPos pPos) {
     }
 
     protected LivingEntity cachedSummoner;
@@ -154,6 +174,18 @@ public class SummonedWeaponEntity extends AbstractSpellCastingMob implements IMa
     public void addAdditionalSaveData(CompoundTag compoundTag) {
         super.addAdditionalSaveData(compoundTag);
         OwnerHelper.serializeOwner(compoundTag, summonerUUID);
+    }
+
+    public static AttributeSupplier.Builder prepareAttributes() {
+        return LivingEntity.createLivingAttributes()
+                .add(Attributes.ATTACK_KNOCKBACK, 1.0)
+                .add(Attributes.ATTACK_DAMAGE, 3.0)
+                .add(Attributes.MAX_HEALTH, 20.0)
+                .add(Attributes.FOLLOW_RANGE, 40.0)
+                .add(Attributes.FLYING_SPEED, 1)
+                .add(Attributes.ENTITY_INTERACTION_RANGE, 3)
+                .add(Attributes.MOVEMENT_SPEED, .2);
+
     }
 
     @Override

@@ -1,0 +1,65 @@
+{
+	"format_version": "1.8.0",
+	"animations": {
+		"summoned_sword_basic_swing": {
+			"animation_length": 1.9583,
+			"bones": {
+				"bone": {
+					"rotation": {
+						"0.0": {
+							"vector": [0, 0, 0]
+						},
+						"0.75": {
+							"vector": [-115.9351, 27.62288, -65.81454]
+						},
+						"1.375": {
+							"vector": [134.06, 27.62, -65.81],
+							"easing": "easeOutQuad"
+						},
+						"1.9583": {
+							"vector": [0, 0, 0],
+							"easing": "easeInOutSine"
+						}
+					},
+					"position": {
+						"0.0": {
+							"vector": [0, 0, 0]
+						},
+						"0.375": {
+							"vector": [-5.5, 0, 0.5],
+							"easing": "easeInSine"
+						},
+						"0.75": {
+							"vector": [-10, 0, 6],
+							"easing": "easeOutSine"
+						},
+						"0.8333": {
+							"vector": [-5.5, 0, -4]
+						},
+						"0.875": {
+							"vector": [-3.25, 0, -8]
+						},
+						"0.9167": {
+							"vector": [-1, 0, -10]
+						},
+						"0.9583": {
+							"vector": [0.5, 0, -9]
+						},
+						"1.0417": {
+							"vector": [3.5, 0, -4]
+						},
+						"1.4167": {
+							"vector": [8, 0, 6],
+							"easing": "easeOutSine"
+						},
+						"1.9583": {
+							"vector": [0, 0, 0],
+							"easing": "easeInOutSine"
+						}
+					}
+				}
+			}
+		}
+	},
+	"geckolib_format_version": 2
+}
