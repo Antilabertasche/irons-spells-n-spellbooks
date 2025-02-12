@@ -6,7 +6,6 @@ import io.redspace.ironsspellbooks.entity.mobs.IAnimatedAttacker;
 import io.redspace.ironsspellbooks.entity.mobs.IMagicSummon;
 import io.redspace.ironsspellbooks.entity.mobs.abstract_spell_casting_mob.AbstractSpellCastingMob;
 import io.redspace.ironsspellbooks.entity.mobs.goals.*;
-import io.redspace.ironsspellbooks.entity.mobs.goals.melee.AttackAnimationData;
 import io.redspace.ironsspellbooks.entity.mobs.wizards.GenericAnimatedWarlockAttackGoal;
 import io.redspace.ironsspellbooks.registries.MobEffectRegistry;
 import io.redspace.ironsspellbooks.util.OwnerHelper;
@@ -31,15 +30,18 @@ import software.bernie.geckolib.animation.*;
 import software.bernie.geckolib.util.GeckoLibUtil;
 
 import javax.annotation.Nullable;
-import java.util.List;
 import java.util.UUID;
 
-public class SummonedWeaponEntity extends AbstractSpellCastingMob implements IMagicSummon, IAnimatedAttacker {
+public abstract class SummonedWeaponEntity extends AbstractSpellCastingMob implements IMagicSummon, IAnimatedAttacker {
     @Override
     public void initiateCastSpell(AbstractSpell spell, int spellLevel) {
         // no spellcasting
         return;
     }
+
+    GenericAnimatedWarlockAttackGoal<? extends SummonedWeaponEntity> attackGoal;
+
+    public abstract GenericAnimatedWarlockAttackGoal<? extends SummonedWeaponEntity> makeAttackGoal();
 
     public SummonedWeaponEntity(EntityType<? extends PathfinderMob> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
@@ -55,14 +57,8 @@ public class SummonedWeaponEntity extends AbstractSpellCastingMob implements IMa
 
     @Override
     protected void registerGoals() {
-        goalSelector.addGoal(1, new GenericAnimatedWarlockAttackGoal<>(this, 1, 0, 20)
-                .setMoveset(List.of(
-                        new AttackAnimationData(36, "summoned_sword_basic_swing", 20),
-                        new AttackAnimationData(52, "summoned_sword_basic_dual_swing", 20, 35),
-                        new AttackAnimationData(40, "summoned_sword_multistab", 20, 26, 32)
-                ))
-                .setMeleeBias(1f, 1f)
-        );
+        attackGoal = makeAttackGoal();
+        goalSelector.addGoal(1, attackGoal.setMeleeBias(1f, 1f));
         goalSelector.addGoal(3, new GenericFollowOwnerGoal(this, this::getSummoner, 1, 9, 4, true, 20));
         goalSelector.addGoal(5, new WaterAvoidingRandomFlyingGoal(this, 0.75));
 
@@ -70,6 +66,7 @@ public class SummonedWeaponEntity extends AbstractSpellCastingMob implements IMa
         this.targetSelector.addGoal(2, new GenericOwnerHurtTargetGoal(this, this::getSummoner));
         this.targetSelector.addGoal(3, new GenericCopyOwnerTargetGoal(this, this::getSummoner));
         this.targetSelector.addGoal(4, (new GenericHurtByTargetGoal(this, (entity) -> entity == getSummoner())).setAlertOthers());
+        this.targetSelector.addGoal(5, new GenericProtectOwnerTargetGoal(this, this::getSummoner));
     }
 
     @Override

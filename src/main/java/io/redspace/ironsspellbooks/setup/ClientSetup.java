@@ -291,6 +291,8 @@ public class ClientSetup {
         event.registerEntityRenderer(EntityRegistry.CURSED_ARMOR_STAND.get(), CursedArmorStandRenderer::new);
         event.registerEntityRenderer(EntityRegistry.THUNDERSTEP_PROJECTILE.get(), ThunderstepProjectileRenderer::new);
         event.registerEntityRenderer(EntityRegistry.SUMMONED_SWORD.get(), SummonedSwordRenderer::new);
+        event.registerEntityRenderer(EntityRegistry.SUMMONED_CLAYMORE.get(), SummonedSwordRenderer::new);
+        event.registerEntityRenderer(EntityRegistry.SUMMONED_RAPIER.get(), SummonedSwordRenderer::new);
 
         event.registerBlockEntityRenderer(BlockRegistry.SCROLL_FORGE_TILE.get(), ScrollForgeRenderer::new);
         event.registerBlockEntityRenderer(BlockRegistry.PEDESTAL_TILE.get(), PedestalRenderer::new);

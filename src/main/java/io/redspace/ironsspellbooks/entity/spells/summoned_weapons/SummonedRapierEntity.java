@@ -1,6 +1,8 @@
 package io.redspace.ironsspellbooks.entity.spells.summoned_weapons;
 
 import io.redspace.ironsspellbooks.capabilities.magic.MagicManager;
+import io.redspace.ironsspellbooks.entity.mobs.goals.melee.AttackAnimationData;
+import io.redspace.ironsspellbooks.entity.mobs.wizards.GenericAnimatedWarlockAttackGoal;
 import io.redspace.ironsspellbooks.util.ParticleHelper;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -16,9 +18,18 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
+import java.util.List;
 import java.util.Optional;
 
 public class SummonedRapierEntity extends SummonedWeaponEntity {
+    @Override
+    public GenericAnimatedWarlockAttackGoal<? extends SummonedWeaponEntity> makeAttackGoal() {
+        return new GenericAnimatedWarlockAttackGoal<>(this, 1, 0, 20)
+                .setMoveset(List.of(
+                        new AttackAnimationData(40, "summoned_sword_multistab", 20, 26, 32)
+                ));
+    }
+
     public SummonedRapierEntity(EntityType<? extends PathfinderMob> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
     }
@@ -26,6 +37,10 @@ public class SummonedRapierEntity extends SummonedWeaponEntity {
     @Override
     public boolean hurt(DamageSource pSource, float pAmount) {
         if (!level.isClientSide && pSource.getEntity() != null && !pSource.is(DamageTypeTags.BYPASSES_INVULNERABILITY)) {
+            // first, ignore summoner damage
+            if (shouldIgnoreDamage(pSource)) {
+                return false;
+            }
             // 20% chance to sidestep entity-caused damage
             if (random.nextFloat() < 0.2f) {
                 performSidestep(pSource.getEntity());

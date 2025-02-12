@@ -233,6 +233,128 @@
 					}
 				}
 			}
+		},
+		"summoned_sword_basic_downswing": {
+			"animation_length": 2.25,
+			"bones": {
+				"bone": {
+					"rotation": {
+						"0.0": {
+							"vector": [0, 0, 0]
+						},
+						"1.0": {
+							"vector": [-127.5, 0, 0],
+							"easing": "easeInOutQuad"
+						},
+						"1.375": {
+							"vector": [27.5, 0, 0],
+							"easing": "easeInOutCubic"
+						},
+						"2.25": {
+							"vector": [0, 0, 0],
+							"easing": "easeInOutQuad"
+						}
+					},
+					"position": {
+						"0.0": {
+							"vector": [0, 0, 0]
+						},
+						"0.3333": {
+							"vector": [0, 6.27, -6.6],
+							"easing": "easeInSine"
+						},
+						"0.6667": {
+							"vector": [0, 12.3, -4.84]
+						},
+						"0.9167": {
+							"vector": [0, 14, -1.75],
+							"easing": "easeOutSine"
+						},
+						"1.2917": {
+							"vector": [0, -8, -8],
+							"easing": "easeInOutQuad"
+						},
+						"2.25": {
+							"vector": [0, 0, 0],
+							"easing": "easeInOutSine"
+						}
+					}
+				}
+			}
+		},
+		"summoned_sword_pommel_strike": {
+			"animation_length": 1.25,
+			"bones": {
+				"bone": {
+					"rotation": {
+						"0.0": {
+							"vector": [0, 0, 0]
+						},
+						"0.5": {
+							"vector": [-79.66, 0, 0],
+							"easing": "easeInSine"
+						},
+						"0.75": {
+							"vector": [-167.5, 0, 0],
+							"easing": "easeOutQuart"
+						},
+						"1.25": {
+							"vector": [0, 0, 0],
+							"easing": "easeInOutSine"
+						}
+					},
+					"position": {
+						"0.0": {
+							"vector": [0, 0, 0]
+						},
+						"0.3333": {
+							"vector": [0, -1.67, 4],
+							"easing": "easeInOutQuad"
+						},
+						"0.75": {
+							"vector": [0, 4, -18],
+							"easing": "easeInOutCubic"
+						},
+						"1.25": {
+							"vector": [0, 0, 0],
+							"easing": "easeInOutSine"
+						}
+					}
+				}
+			}
+		},
+		"claymore_taunt": {
+			"animation_length": 6,
+			"bones": {
+				"bone": {
+					"rotation": {
+						"0.0": {
+							"vector": [0, 0, 0]
+						},
+						"0.7917": {
+							"vector": [90, 0, 0],
+							"easing": "easeInOutQuad"
+						}
+					},
+					"position": {
+						"0.0": {
+							"vector": [0, 0, 0]
+						},
+						"0.7917": {
+							"vector": [0, 39, -5.5],
+							"easing": "easeInOutQuad"
+						},
+						"1.0": {
+							"vector": [0, 13, -5.5],
+							"easing": "easeInOutQuad"
+						},
+						"6.0": {
+							"vector": [0, 13, -5.5],
+							"easing": "easeInOutQuad"
+						}
+					}
+				}
+			}
 		}
 	},
 	"geckolib_format_version": 2

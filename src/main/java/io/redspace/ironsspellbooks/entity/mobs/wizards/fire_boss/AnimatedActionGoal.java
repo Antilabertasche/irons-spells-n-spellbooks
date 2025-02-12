@@ -8,10 +8,10 @@ import net.minecraft.world.entity.ai.goal.Goal;
 import java.util.EnumSet;
 
 public abstract class AnimatedActionGoal<T extends Mob & IMagicEntity & IAnimatedAttacker> extends Goal {
-    int abilityTimer;
-    int delay;
-    boolean isUsing;
-    final T mob;
+    protected int abilityTimer;
+    protected int delay;
+    protected boolean isUsing;
+    protected final T mob;
 
     public AnimatedActionGoal(T mob) {
         this.setFlags(EnumSet.of(Flag.TARGET));
