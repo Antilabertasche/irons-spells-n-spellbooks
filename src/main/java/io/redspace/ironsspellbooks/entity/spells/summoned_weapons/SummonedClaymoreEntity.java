@@ -1,13 +1,17 @@
 package io.redspace.ironsspellbooks.entity.spells.summoned_weapons;
 
+import io.redspace.ironsspellbooks.api.registry.SpellRegistry;
 import io.redspace.ironsspellbooks.capabilities.magic.MagicManager;
 import io.redspace.ironsspellbooks.entity.mobs.goals.melee.AttackAnimationData;
 import io.redspace.ironsspellbooks.entity.mobs.goals.melee.AttackKeyframe;
 import io.redspace.ironsspellbooks.entity.mobs.wizards.GenericAnimatedWarlockAttackGoal;
 import io.redspace.ironsspellbooks.entity.mobs.wizards.fire_boss.AnimatedActionGoal;
+import io.redspace.ironsspellbooks.particle.BlastwaveParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.effect.MobEffects;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
@@ -18,13 +22,29 @@ import net.minecraft.world.phys.Vec3;
 import java.util.List;
 
 public class SummonedClaymoreEntity extends SummonedWeaponEntity {
+    private static final EntityDataAccessor<Boolean> DATA_IS_TAUNTING = SynchedEntityData.defineId(SummonedClaymoreEntity.class, EntityDataSerializers.BOOLEAN);
+
+    @Override
+    protected void defineSynchedData(SynchedEntityData.Builder pBuilder) {
+        super.defineSynchedData(pBuilder);
+        pBuilder.define(DATA_IS_TAUNTING, false);
+    }
+
+    public boolean isTaunting() {
+        return entityData.get(DATA_IS_TAUNTING);
+    }
+
+    public void setTaunting(boolean taunting) {
+        entityData.set(DATA_IS_TAUNTING, taunting);
+    }
+
     public SummonedClaymoreEntity(EntityType<? extends PathfinderMob> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
     }
 
     @Override
     public GenericAnimatedWarlockAttackGoal<? extends SummonedWeaponEntity> makeAttackGoal() {
-        return new GenericAnimatedWarlockAttackGoal<>/*DefendOwnerWarlockAttackGoal*/(this, 1, 20, 40)
+        return new GenericAnimatedWarlockAttackGoal<>/*DefendOwnerWarlockAttackGoal*/(this, 1.2, 20, 40)
                 .setMoveset(List.of(
                         AttackAnimationData.builder("summoned_sword_pommel_strike")
                                 .length(24).attacks(new AttackKeyframe(12, new Vec3(0, 0, .45f), new Vec3(0, 0, 1))).build(),
@@ -34,9 +54,31 @@ public class SummonedClaymoreEntity extends SummonedWeaponEntity {
     }
 
     @Override
+    public void tick() {
+        super.tick();
+        if (isTaunting()) {
+            zza = 0;
+            xxa = 0;
+        }
+    }
+
+    @Override
+    public boolean isPushable() {
+        return super.isPushable() && !isTaunting();
+    }
+
+    @Override
     protected void registerGoals() {
         goalSelector.addGoal(0, new ClaymoreTauntGoal(this));
         super.registerGoals();
+    }
+
+    @Override
+    public boolean hurt(DamageSource pSource, float pAmount) {
+        if (isTaunting()) {
+            pAmount *= .2f;
+        }
+        return super.hurt(pSource, pAmount);
     }
 
     public static class ClaymoreTauntGoal extends AnimatedActionGoal<SummonedClaymoreEntity> {
@@ -84,17 +126,17 @@ public class SummonedClaymoreEntity extends SummonedWeaponEntity {
         @Override
         public void tick() {
             super.tick();
-            mob.setDeltaMovement(mob.getDeltaMovement().multiply(0.8, 0.0, 0.8).add(0, -0.2, 0));
+            mob.setDeltaMovement(mob.getDeltaMovement().multiply(0.8, 0.0, 0.8).add(0, -1, 0));
         }
 
         @Override
         protected void doAction() {
-            mob.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 20 * 5, 3, false, false));
+            mob.setTaunting(true);
+            MagicManager.spawnParticles(mob.level, new BlastwaveParticleOptions(SpellRegistry.ECHOING_STRIKES_SPELL.get().getSchoolType().getTargetingColor(), 3), mob.getX(), mob.getY(), mob.getZ(), 1, 0, 0, 0, 0, true);
             if (targets != null) {
                 targets.forEach(entity -> {
-                    //fixme: not working
                     if (entity instanceof Mob tauntmob) {
-                        MagicManager.spawnParticles(mob.level, ParticleTypes.ANGRY_VILLAGER, tauntmob.getX(), tauntmob.getEyeY() + (tauntmob.getBoundingBox().maxY - tauntmob.getEyeY()) * 2, tauntmob.getZ(), 5, 0.1, 0.1, 0.1, 0, true);
+                        MagicManager.spawnParticles(mob.level, ParticleTypes.ANGRY_VILLAGER, tauntmob.getX(), tauntmob.getEyeY() + (tauntmob.getBoundingBox().maxY - tauntmob.getEyeY()) * 2, tauntmob.getZ(), 5, 0.3, 0.3, 0.3, 0, false);
                         tauntmob.setTarget(this.mob);
                     }
                 });
@@ -104,6 +146,7 @@ public class SummonedClaymoreEntity extends SummonedWeaponEntity {
         @Override
         public void stop() {
             super.stop();
+            mob.setTaunting(false);
             targets = null;
         }
     }

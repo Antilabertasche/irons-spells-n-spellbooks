@@ -14,6 +14,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -53,6 +54,16 @@ public abstract class SummonedWeaponEntity extends AbstractSpellCastingMob imple
     public SpawnGroupData finalizeSpawn(ServerLevelAccessor pLevel, DifficultyInstance pDifficulty, MobSpawnType pSpawnType, @org.jetbrains.annotations.Nullable SpawnGroupData pSpawnGroupData) {
         this.setNoGravity(true);
         return super.finalizeSpawn(pLevel, pDifficulty, pSpawnType, pSpawnGroupData);
+    }
+
+    @Override
+    public boolean fireImmune() {
+        return true;
+    }
+
+    @Override
+    public boolean canBeAffected(MobEffectInstance pEffectInstance) {
+        return false;
     }
 
     @Override

@@ -9,12 +9,15 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
 import software.bernie.geckolib.cache.object.BakedGeoModel;
+import software.bernie.geckolib.model.GeoModel;
 import software.bernie.geckolib.renderer.GeoEntityRenderer;
 import software.bernie.geckolib.util.Color;
 
+import java.util.function.Supplier;
+
 public class SummonedSwordRenderer extends GeoEntityRenderer<SummonedWeaponEntity> {
-    public SummonedSwordRenderer(EntityRendererProvider.Context renderManager) {
-        super(renderManager, new SummonedSwordModel());
+    public SummonedSwordRenderer(EntityRendererProvider.Context renderManager, Supplier<GeoModel<SummonedWeaponEntity>> model) {
+        super(renderManager, model.get());
     }
 
     @Override

@@ -24,7 +24,7 @@ import java.util.Optional;
 public class SummonedRapierEntity extends SummonedWeaponEntity {
     @Override
     public GenericAnimatedWarlockAttackGoal<? extends SummonedWeaponEntity> makeAttackGoal() {
-        return new GenericAnimatedWarlockAttackGoal<>(this, 1, 0, 20)
+        return new GenericAnimatedWarlockAttackGoal<>(this, 2, 0, 20)
                 .setMoveset(List.of(
                         new AttackAnimationData(40, "summoned_sword_multistab", 20, 26, 32)
                 ));
@@ -42,7 +42,7 @@ public class SummonedRapierEntity extends SummonedWeaponEntity {
                 return false;
             }
             // 20% chance to sidestep entity-caused damage
-            if (random.nextFloat() < 0.2f) {
+            if (random.nextFloat() < 0.3f) {
                 performSidestep(pSource.getEntity());
                 return false;
             }
