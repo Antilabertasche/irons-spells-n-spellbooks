@@ -1,5 +1,6 @@
 package io.redspace.ironsspellbooks.api.util;
 
+import io.redspace.ironsspellbooks.config.ClientConfigs;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.Entity;
@@ -24,6 +25,9 @@ public class MusicManager {
     }
 
     public static void createEvent(ResourceKey<Level> dimension, UUID id, IMusicHandler event) {
+        if(!ClientConfigs.ENABLE_BOSS_MUSIC.get()){
+            return;
+        }
         var manager = getManagerFor(dimension);
         if (!manager.musicHandlers.isEmpty()) {
             manager.musicHandlers.lastEntry().getValue().stop();
