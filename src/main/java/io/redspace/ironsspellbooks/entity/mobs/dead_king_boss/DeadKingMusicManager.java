@@ -1,28 +1,21 @@
 package io.redspace.ironsspellbooks.entity.mobs.dead_king_boss;
 
-import io.redspace.ironsspellbooks.config.ClientConfigs;
+import io.redspace.ironsspellbooks.api.util.IMusicHandler;
 import io.redspace.ironsspellbooks.registries.SoundRegistry;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.sounds.SoundManager;
 import net.minecraft.sounds.SoundSource;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.client.event.ClientTickEvent;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.HashSet;
 import java.util.Set;
 
-@EventBusSubscriber(Dist.CLIENT)
-public class DeadKingMusicManager {
-    @Nullable
-    private static DeadKingMusicManager INSTANCE;
+public class DeadKingMusicManager implements IMusicHandler {
     static final SoundSource SOUND_SOURCE = SoundSource.RECORDS;
     static final int FIRST_PHASE_MELODY_LENGTH_MILIS = 28790;
     static final int INTRO_LENGTH_MILIS = 17600;
 
     DeadKingBoss boss;
+    final int entityid;
     final SoundManager soundManager;
     FadeableSoundInstance beginSound;
     FadeableSoundInstance firstPhaseMelody;
@@ -30,14 +23,14 @@ public class DeadKingMusicManager {
     FadeableSoundInstance secondPhaseMelody;
     FadeableSoundInstance transitionMusic;
     Set<FadeableSoundInstance> layers = new HashSet<>();
-    private int accentStage = 0;
     private long lastMilisPlayed;
     private boolean hasPlayedIntro;
     DeadKingBoss.Phases stage;
     boolean finishing = false;
 
-    private DeadKingMusicManager(DeadKingBoss boss) {
+    public DeadKingMusicManager(DeadKingBoss boss) {
         this.boss = boss;
+        this.entityid = boss.getId();
         this.soundManager = Minecraft.getInstance().getSoundManager();
         stage = DeadKingBoss.Phases.values()[boss.getPhase()];
         beginSound = new FadeableSoundInstance(SoundRegistry.DEAD_KING_MUSIC_INTRO.get(), SOUND_SOURCE, false);
@@ -45,10 +38,10 @@ public class DeadKingMusicManager {
         firstPhaseAccent = new FadeableSoundInstance(SoundRegistry.DEAD_KING_FIRST_PHASE_ACCENT_01.get(), SOUND_SOURCE, false);
         secondPhaseMelody = new FadeableSoundInstance(SoundRegistry.DEAD_KING_SECOND_PHASE_MELODY_ALT.get(), SOUND_SOURCE, true);
         transitionMusic = new FadeableSoundInstance(SoundRegistry.DEAD_KING_SUSPENSE.get(), SOUND_SOURCE, false);
-        init();
     }
 
-    private void init() {
+    @Override
+    public void init() {
         soundManager.stop(null, SoundSource.MUSIC);
         switch (stage) {
             case FirstPhase -> {
@@ -59,31 +52,14 @@ public class DeadKingMusicManager {
         }
     }
 
-    @SubscribeEvent
-    public static void clientTick(ClientTickEvent.Pre event) {
-        if (INSTANCE != null && !Minecraft.getInstance().isPaused()) {
-            INSTANCE.tick();
-        }
+    @Override
+    public void stop() {
+        stopLayers();
+        finishing = true;
     }
 
-    public static void createOrResumeInstance(DeadKingBoss boss) {
-        if (INSTANCE == null || INSTANCE.isDone()) {
-            if (ClientConfigs.ENABLE_BOSS_MUSIC.get()) {
-                INSTANCE = new DeadKingMusicManager(boss);
-            }
-        } else {
-            INSTANCE.triggerResume(boss);
-        }
-    }
-
-    public static void stop(DeadKingBoss boss) {
-        if (INSTANCE != null && INSTANCE.boss.getUUID().equals(boss.getUUID())) {
-            INSTANCE.stopLayers();
-            INSTANCE.finishing = true;
-        }
-    }
-
-    private void tick() {
+    @Override
+    public void tick() {
         if (isDone() || finishing) {
             return;
         }
@@ -123,10 +99,8 @@ public class DeadKingMusicManager {
         }
     }
 
-    /**
-     * Returns true if instance is completely over
-     */
-    private boolean isDone() {
+    @Override
+    public boolean isDone() {
         for (FadeableSoundInstance soundInstance : layers) {
             if (!soundInstance.isStopped() && soundManager.isActive(soundInstance)) {
                 return false;
@@ -142,7 +116,6 @@ public class DeadKingMusicManager {
     }
 
     private void playAccent(FadeableSoundInstance soundInstance) {
-        accentStage++;
         lastMilisPlayed = System.currentTimeMillis();
         addLayer(soundInstance);
     }
@@ -151,17 +124,16 @@ public class DeadKingMusicManager {
         layers.forEach(FadeableSoundInstance::triggerStop);
     }
 
-    public static void hardStop() {
-        if (INSTANCE != null) {
-            INSTANCE.layers.forEach(INSTANCE.soundManager::stop);
-            INSTANCE = null;
-        }
+    @Override
+    public void hardStop() {
+        layers.forEach(soundManager::stop);
     }
 
-    public void triggerResume(DeadKingBoss boss) {
-        if (boss.getUUID().equals(this.boss.getUUID())) {
+    @Override
+    public void triggerResume() {
+        if (Minecraft.getInstance().level != null) {
             //Object reference could have changed, update it if it is the same entity
-            this.boss = boss;
+            this.boss = Minecraft.getInstance().level.getEntity(entityid) instanceof DeadKingBoss deadKingBoss ? deadKingBoss : this.boss;
         }
         if (!this.boss.isRemoved()) {
             layers.forEach((sound) -> {
@@ -170,18 +142,15 @@ public class DeadKingMusicManager {
                     soundManager.play(sound);
                 }
             });
-            finishing = false;
         }
     }
 
     private void initFirstPhase() {
-        accentStage = 0;
         addLayer(firstPhaseMelody);
         playAccent(firstPhaseAccent);
     }
 
     private void initSecondPhase() {
-        accentStage = 0;
         addLayer(secondPhaseMelody);
     }
 }

@@ -6,28 +6,40 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.client.event.ClientTickEvent;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.UUID;
 
 @EventBusSubscriber
 public class BossMusicManager {
     private static final Map<ResourceKey<Level>, BossMusicManager> MUSIC_MANAGERS = new HashMap<>();
-    private final LinkedHashMap<UUID, IBossMusicHandler> musicHandlers = new LinkedHashMap<>();
+    private final LinkedHashMap<UUID, IMusicHandler> musicHandlers = new LinkedHashMap<>();
+    private boolean resumeNext;
 
-    public static void createEvent(Entity entity, IBossMusicHandler event) {
+    public static void createEvent(Entity entity, IMusicHandler event) {
         createEvent(entity.level.dimension(), entity.getUUID(), event);
     }
 
-    public static void createEvent(ResourceKey<Level> dimension, UUID id, IBossMusicHandler event) {
+    public static void createEvent(ResourceKey<Level> dimension, UUID id, IMusicHandler event) {
         var manager = getManagerFor(dimension);
+        if (!manager.musicHandlers.isEmpty()) {
+            manager.musicHandlers.lastEntry().getValue().stop();
+        }
+        event.init();
         manager.musicHandlers.put(id, event);
     }
 
-    public static void stopEvent(Entity entity) {
+    public static void stopEvent(UUID uuid) {
         // while we only create events per-dimension, if something in any dimension calls for a specific uuid to be cancelled, we cancel it
         for (BossMusicManager manager : MUSIC_MANAGERS.values()) {
-            if (manager.musicHandlers.containsKey(entity.getUUID())) {
-                manager.musicHandlers.remove(entity.getUUID()).stop(entity);
+            if (manager.musicHandlers.containsKey(uuid)) {
+                manager.musicHandlers.remove(uuid).stop();
+                if (!manager.musicHandlers.isEmpty()) {
+                    manager.resumeNext = true;
+                }
             }
         }
     }
@@ -38,7 +50,7 @@ public class BossMusicManager {
 
     public static void clear() {
         for (BossMusicManager m : MUSIC_MANAGERS.values()) {
-            for (IBossMusicHandler<?> h : m.musicHandlers.values()) {
+            for (IMusicHandler h : m.musicHandlers.values()) {
                 h.hardStop();
             }
         }
@@ -46,12 +58,23 @@ public class BossMusicManager {
     }
 
     @SubscribeEvent
-    public static void fog(/*ViewportEvent.ComputeFogColor*/ event) {
-        if (Minecraft.getInstance().player != null) {
+    public static void tick(ClientTickEvent.Pre event) {
+        if (Minecraft.getInstance().player != null && !Minecraft.getInstance().isPaused()) {
             var manager = getManagerFor(Minecraft.getInstance().player.level.dimension());
-            if (!manager.musicHandlers.isEmpty()) {
-                IBossMusicHandler<?> fogEvent = manager.musicHandlers.lastEntry().getValue();
-                fogEvent.tick();
+            if (manager.musicHandlers.isEmpty()) {
+                return;
+            }
+            var entry = manager.musicHandlers.lastEntry();
+            UUID uuid = entry.getKey();
+            IMusicHandler musicHandler = entry.getValue();
+            if (manager.resumeNext) {
+                musicHandler.triggerResume();
+                manager.resumeNext = false;
+            }
+            if (musicHandler.isDone()) {
+                manager.musicHandlers.remove(uuid);
+            } else {
+                musicHandler.tick();
             }
         }
     }

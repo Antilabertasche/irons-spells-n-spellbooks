@@ -1,8 +1,6 @@
 package io.redspace.ironsspellbooks.api.util;
 
-import net.minecraft.world.entity.Entity;
-
-public interface IBossMusicHandler {
+public interface IMusicHandler {
     /**
      * Begin music, or resume music from save
      */

@@ -55,6 +55,7 @@ public class FadeableSoundInstance extends AbstractTickableSoundInstance {
     }
 
     public void triggerStart() {
+        this.stopped = false;
         this.triggerEnd = false;
         if (volume < 1f) {
             transitionTicks = (int) (START_TRANSITION_TIME * volume);
