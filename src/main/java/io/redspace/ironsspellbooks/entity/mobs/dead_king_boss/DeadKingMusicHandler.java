@@ -9,7 +9,7 @@ import net.minecraft.sounds.SoundSource;
 import java.util.HashSet;
 import java.util.Set;
 
-public class DeadKingMusicManager implements IMusicHandler {
+public class DeadKingMusicHandler implements IMusicHandler {
     static final SoundSource SOUND_SOURCE = SoundSource.RECORDS;
     static final int FIRST_PHASE_MELODY_LENGTH_MILIS = 28790;
     static final int INTRO_LENGTH_MILIS = 17600;
@@ -28,7 +28,7 @@ public class DeadKingMusicManager implements IMusicHandler {
     DeadKingBoss.Phases stage;
     boolean finishing = false;
 
-    public DeadKingMusicManager(DeadKingBoss boss) {
+    public DeadKingMusicHandler(DeadKingBoss boss) {
         this.boss = boss;
         this.entityid = boss.getId();
         this.soundManager = Minecraft.getInstance().getSoundManager();

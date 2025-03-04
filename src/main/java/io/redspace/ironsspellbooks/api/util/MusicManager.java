@@ -14,8 +14,8 @@ import java.util.Map;
 import java.util.UUID;
 
 @EventBusSubscriber
-public class BossMusicManager {
-    private static final Map<ResourceKey<Level>, BossMusicManager> MUSIC_MANAGERS = new HashMap<>();
+public class MusicManager {
+    private static final Map<ResourceKey<Level>, MusicManager> MUSIC_MANAGERS = new HashMap<>();
     private final LinkedHashMap<UUID, IMusicHandler> musicHandlers = new LinkedHashMap<>();
     private boolean resumeNext;
 
@@ -34,7 +34,7 @@ public class BossMusicManager {
 
     public static void stopEvent(UUID uuid) {
         // while we only create events per-dimension, if something in any dimension calls for a specific uuid to be cancelled, we cancel it
-        for (BossMusicManager manager : MUSIC_MANAGERS.values()) {
+        for (MusicManager manager : MUSIC_MANAGERS.values()) {
             if (manager.musicHandlers.containsKey(uuid)) {
                 manager.musicHandlers.remove(uuid).stop();
                 if (!manager.musicHandlers.isEmpty()) {
@@ -44,12 +44,12 @@ public class BossMusicManager {
         }
     }
 
-    private static BossMusicManager getManagerFor(ResourceKey<Level> dimension) {
-        return MUSIC_MANAGERS.computeIfAbsent(dimension, (dim) -> new BossMusicManager());
+    private static MusicManager getManagerFor(ResourceKey<Level> dimension) {
+        return MUSIC_MANAGERS.computeIfAbsent(dimension, (dim) -> new MusicManager());
     }
 
     public static void clear() {
-        for (BossMusicManager m : MUSIC_MANAGERS.values()) {
+        for (MusicManager m : MUSIC_MANAGERS.values()) {
             for (IMusicHandler h : m.musicHandlers.values()) {
                 h.hardStop();
             }

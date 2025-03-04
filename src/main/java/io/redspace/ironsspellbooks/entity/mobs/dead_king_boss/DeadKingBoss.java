@@ -6,7 +6,7 @@ import io.redspace.ironsspellbooks.api.network.IClientEventEntity;
 import io.redspace.ironsspellbooks.api.registry.AttributeRegistry;
 import io.redspace.ironsspellbooks.api.registry.SpellRegistry;
 import io.redspace.ironsspellbooks.api.spells.AbstractSpell;
-import io.redspace.ironsspellbooks.api.util.BossMusicManager;
+import io.redspace.ironsspellbooks.api.util.MusicManager;
 import io.redspace.ironsspellbooks.api.util.Utils;
 import io.redspace.ironsspellbooks.capabilities.magic.MagicManager;
 import io.redspace.ironsspellbooks.entity.mobs.IAnimatedAttacker;
@@ -73,8 +73,8 @@ public class DeadKingBoss extends AbstractSpellCastingMob implements Enemy, IAni
     @Override
     public void handleClientEvent(byte eventId) {
         switch (eventId) {
-            case STOP_MUSIC -> BossMusicManager.stopEvent(this.getUUID());
-            case START_MUSIC -> BossMusicManager.createEvent(this, new DeadKingMusicManager(this));
+            case STOP_MUSIC -> MusicManager.stopEvent(this.getUUID());
+            case START_MUSIC -> MusicManager.createEvent(this, new DeadKingMusicHandler(this));
         }
     }
 

@@ -9,7 +9,7 @@ import io.redspace.ironsspellbooks.api.spells.CastSource;
 import io.redspace.ironsspellbooks.api.spells.CastType;
 import io.redspace.ironsspellbooks.api.spells.ISpellContainer;
 import io.redspace.ironsspellbooks.api.spells.SpellData;
-import io.redspace.ironsspellbooks.api.util.BossMusicManager;
+import io.redspace.ironsspellbooks.api.util.MusicManager;
 import io.redspace.ironsspellbooks.api.util.FogManager;
 import io.redspace.ironsspellbooks.api.util.Utils;
 import io.redspace.ironsspellbooks.capabilities.magic.SyncedSpellData;
@@ -79,7 +79,7 @@ public class ClientPlayerEvents {
     @SubscribeEvent
     public static void onPlayerLogOut(ClientPlayerNetworkEvent.LoggingOut event) {
         IronsSpellbooks.LOGGER.debug("ClientPlayerNetworkEvent onPlayerLogOut");
-        BossMusicManager.clear();
+        MusicManager.clear();
         GuidingBoltManager.handleClientLogout();
         ClientMagicData.spellSelectionManager = null;
         FogManager.clear();
