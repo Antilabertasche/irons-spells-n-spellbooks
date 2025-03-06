@@ -4,10 +4,7 @@ import io.redspace.ironsspellbooks.IronsSpellbooks;
 import io.redspace.ironsspellbooks.api.network.IClientEventEntity;
 import io.redspace.ironsspellbooks.api.registry.AttributeRegistry;
 import io.redspace.ironsspellbooks.api.registry.SpellRegistry;
-import io.redspace.ironsspellbooks.api.util.CameraShakeData;
-import io.redspace.ironsspellbooks.api.util.CameraShakeManager;
-import io.redspace.ironsspellbooks.api.util.FogManager;
-import io.redspace.ironsspellbooks.api.util.Utils;
+import io.redspace.ironsspellbooks.api.util.*;
 import io.redspace.ironsspellbooks.capabilities.magic.MagicManager;
 import io.redspace.ironsspellbooks.config.ServerConfigs;
 import io.redspace.ironsspellbooks.entity.mobs.IAnimatedAttacker;
@@ -86,8 +83,8 @@ import java.util.List;
 import java.util.Optional;
 
 public class FireBossEntity extends AbstractSpellCastingMob implements Enemy, IAnimatedAttacker, IEntityWithComplexSpawn, IClientEventEntity {
-    public static final byte STOP_FOG = 0;
-    public static final byte START_FOG = 1;
+    public static final byte CLIENT_STOP_TRACKING = 0;
+    public static final byte CLIENT_START_TRACKING = 1;
     public static final byte PROC_HALF_HEALTH_TIMER = 2;
     public static final byte STOP_HALF_HEALTH_TIMER = 3;
     /**
@@ -102,8 +99,14 @@ public class FireBossEntity extends AbstractSpellCastingMob implements Enemy, IA
     @Override
     public void handleClientEvent(byte eventId) {
         switch (eventId) {
-            case STOP_FOG -> FogManager.stopEvent(this.uuid);
-            case START_FOG -> FogManager.createEvent(this, new FogManager.FogEvent(Optional.empty(), true));
+            case CLIENT_STOP_TRACKING -> {
+                FogManager.stopEvent(this.uuid);
+                MusicManager.stopEvent(this.uuid);
+            }
+            case CLIENT_START_TRACKING -> {
+                FogManager.createEvent(this, new FogManager.FogEvent(Optional.empty(), true));
+                MusicManager.createEvent(this, new FireBossMusicHandler());
+            }
             case PROC_HALF_HEALTH_TIMER -> this.halfHealthTimer = HALF_HEALTH_ANIM_DURATION;
             case STOP_HALF_HEALTH_TIMER -> this.halfHealthTimer = 0;
         }
@@ -197,13 +200,13 @@ public class FireBossEntity extends AbstractSpellCastingMob implements Enemy, IA
     public void startSeenByPlayer(ServerPlayer pPlayer) {
         super.startSeenByPlayer(pPlayer);
         this.bossEvent.addPlayer(pPlayer);
-        PacketDistributor.sendToPlayer(pPlayer, new EntityEventPacket<FireBossEntity>(this, START_FOG));
+        PacketDistributor.sendToPlayer(pPlayer, new EntityEventPacket<FireBossEntity>(this, CLIENT_START_TRACKING));
     }
 
     public void stopSeenByPlayer(ServerPlayer pPlayer) {
         super.stopSeenByPlayer(pPlayer);
         this.bossEvent.removePlayer(pPlayer);
-        PacketDistributor.sendToPlayer(pPlayer, new EntityEventPacket<FireBossEntity>(this, STOP_FOG));
+        PacketDistributor.sendToPlayer(pPlayer, new EntityEventPacket<FireBossEntity>(this, CLIENT_STOP_TRACKING));
     }
 
     FireBossAttackGoal attackGoal;

@@ -737,5 +737,40 @@
       "irons_spellbooks:tower_guard_swing_02",
       "irons_spellbooks:tower_guard_swing_03"
     ]
+  },
+  "music.fire_boss.bass_a": {
+    "sounds": [
+      "irons_spellbooks:fire_boss/music/bass_a"
+    ]
+  },
+  "music.fire_boss.drums_a": {
+    "sounds": [
+      "irons_spellbooks:fire_boss/music/drums_a"
+    ]
+  },
+  "music.fire_boss.drums_b": {
+    "sounds": [
+      "irons_spellbooks:fire_boss/music/drums_b"
+    ]
+  },
+  "music.fire_boss.orchestra": {
+    "sounds": [
+      "irons_spellbooks:fire_boss/music/orchestra"
+    ]
+  },
+  "music.fire_boss.melody": {
+    "sounds": [
+      "irons_spellbooks:fire_boss/music/melody"
+    ]
+  },
+  "music.fire_boss.choir": {
+    "sounds": [
+      "irons_spellbooks:fire_boss/music/choir"
+    ]
+  },
+  "music.fire_boss.bells_a": {
+    "sounds": [
+      "irons_spellbooks:fire_boss/music/bells_a"
+    ]
   }
 }

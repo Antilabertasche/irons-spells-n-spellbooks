@@ -12,7 +12,7 @@ public class FadeableSoundInstance extends AbstractTickableSoundInstance {
     private static final int START_TRANSITION_TIME = 40;
     private static final int END_TRANSITION_TIME = 40;
 
-    protected FadeableSoundInstance(SoundEvent soundEvent, SoundSource source, boolean loop) {
+    public FadeableSoundInstance(SoundEvent soundEvent, SoundSource source, boolean loop) {
         super(soundEvent, source, SoundInstance.createUnseededRandom());
         this.attenuation = SoundInstance.Attenuation.NONE;
         this.looping = loop;
@@ -38,6 +38,11 @@ public class FadeableSoundInstance extends AbstractTickableSoundInstance {
                 this.stop();
             }
         }
+    }
+
+    public void unstop() {
+        stopped = false;
+        volume = 1f;
     }
 
     @Override
