@@ -2,7 +2,6 @@ package io.redspace.ironsspellbooks.entity.mobs.goals;
 
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal;
-import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 
 public class MomentHurtByTargetGoal extends HurtByTargetGoal {
     int forcedAggroTime;
@@ -12,13 +11,13 @@ public class MomentHurtByTargetGoal extends HurtByTargetGoal {
         super(pMob, pToIgnoreDamage);
     }
 
-    @Override
-    public void stop() {
-        if (mob.getTarget() != null && !canAttack(mob.getTarget(), TargetingConditions.forCombat().ignoreLineOfSight().ignoreInvisibilityTesting())) {
-            this.mob.setTarget(null);
-            this.targetMob = null;
-        }
-    }
+//    @Override
+//    public void stop() {
+//        if (mob.getTarget() != null && !canAttack(mob.getTarget(), TargetingConditions.forCombat().ignoreLineOfSight().ignoreInvisibilityTesting())) {
+//            this.mob.setTarget(null);
+//            this.targetMob = null;
+//        }
+//    }
 
     @Override
     public void tick() {
