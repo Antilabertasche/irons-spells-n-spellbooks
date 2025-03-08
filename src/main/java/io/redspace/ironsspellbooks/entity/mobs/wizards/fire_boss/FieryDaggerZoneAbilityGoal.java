@@ -64,7 +64,7 @@ public class FieryDaggerZoneAbilityGoal extends AnimatedActionGoal<FireBossEntit
                 dagger.setOwner(mob);
                 dagger.setPos(start);
                 dagger.delay = delay;
-                dagger.setDamage((float) (mob.getAttributeValue(Attributes.ATTACK_DAMAGE) * .25));
+                dagger.setDamage((float) (mob.getAttributeValue(Attributes.ATTACK_DAMAGE) * .75));
                 dagger.setExplosionRadius(4 + Utils.random.nextFloat() * 2);
                 dagger.setNoGravity(false);
 
