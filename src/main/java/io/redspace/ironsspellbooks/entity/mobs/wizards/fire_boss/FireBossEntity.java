@@ -393,7 +393,7 @@ public class FireBossEntity extends AbstractSpellCastingMob implements Enemy, IA
         this.getAttribute(AttributeRegistry.MAX_MANA).addOrReplacePermanentModifier(MANA_MODIFIER);
         this.playerScale = pLevel.players().stream().filter(player -> distanceToSqr(player) < 3600 && !player.isSpectator() && !player.isCreative()).toList().size();
         int extraPlayers = Math.max(0, playerScale - 1);
-        double extraHealthPercent = extraPlayers * 0.30 + extraPlayers * extraPlayers * 0.10;
+        double extraHealthPercent = extraPlayers * 0.40 + extraPlayers * extraPlayers * 0.10;
         double extraHealth = ServerConfigs.TYROS_ADDITIONAL_HEALTH.get();
         double extraDamage = ServerConfigs.TYROS_ADDITIONAL_ATTACK_DAMAGE.get();
         double extraPower = ServerConfigs.TYROS_ADDITIONAL_SPELL_POWER.get();
@@ -900,10 +900,13 @@ public class FireBossEntity extends AbstractSpellCastingMob implements Enemy, IA
             return false;
         }
         if (isStanceBroken()) {
-            pAmount *= 0.75f;
+            pAmount *= 0.60f;
         }
         if (isSoulMode()) {
-            pAmount *= 0.4f;
+            pAmount *= 0.50f;
+        }
+        if(isHalfHealthAttacking()){
+            pAmount *= 0.80f;
         }
         // damage limiter
         var limit = getMaxHealth() * 0.025f;
