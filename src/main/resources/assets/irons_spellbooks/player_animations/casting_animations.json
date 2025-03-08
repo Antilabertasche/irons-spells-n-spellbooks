@@ -14218,7 +14218,21 @@
 				},
 				"bipedHandRight": {
 					"rotation": {
-						"vector": [0, 0, 0]
+						"0.0": {
+							"vector": [0, 0, 0]
+						},
+						"1.5": {
+							"vector": [0, 0, -40],
+							"easing": "easeInOutQuad"
+						},
+						"4.5": {
+							"vector": [0, 0, -40],
+							"easing": "easeInOutQuad"
+						},
+						"5.5": {
+							"vector": [0, 0, 0],
+							"easing": "easeInOutSine"
+						}
 					}
 				},
 				"left_arm": {
@@ -15996,11 +16010,11 @@
 							"easing": "linear"
 						},
 						"1.8333": {
-							"vector": [0, 37.5, -90],
+							"vector": [0, 0, -90],
 							"easing": "linear"
 						},
 						"2.5": {
-							"vector": [0, 25, -80],
+							"vector": [0, 0, -90],
 							"easing": "easeInOutQuad"
 						},
 						"3.125": {

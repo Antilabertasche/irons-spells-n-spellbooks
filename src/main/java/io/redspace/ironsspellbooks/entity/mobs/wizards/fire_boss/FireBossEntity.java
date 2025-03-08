@@ -139,6 +139,10 @@ public class FireBossEntity extends AbstractSpellCastingMob implements Enemy, IA
      * Client flag for whether code animations should pause over current animation
      */
     private boolean canAnimateOver;
+    /**
+     * Client flag for whether the head should stop animating lookat for the current animation
+     */
+    private boolean stopHeadAnimation;
 
     /**
      * Client side model control value
@@ -388,8 +392,8 @@ public class FireBossEntity extends AbstractSpellCastingMob implements Enemy, IA
         this.setLeftHanded(false);
         this.getAttribute(AttributeRegistry.MAX_MANA).addOrReplacePermanentModifier(MANA_MODIFIER);
         this.playerScale = pLevel.players().stream().filter(player -> distanceToSqr(player) < 3600 && !player.isSpectator() && !player.isCreative()).toList().size();
-        int extraPlayers = playerScale - 1;
-        double extraHealthPercent = extraPlayers * 0.08 + extraPlayers * extraPlayers * 0.02;
+        int extraPlayers = Math.max(0, playerScale - 1);
+        double extraHealthPercent = extraPlayers * 0.30 + extraPlayers * extraPlayers * 0.10;
         double extraHealth = ServerConfigs.TYROS_ADDITIONAL_HEALTH.get();
         double extraDamage = ServerConfigs.TYROS_ADDITIONAL_ATTACK_DAMAGE.get();
         double extraPower = ServerConfigs.TYROS_ADDITIONAL_SPELL_POWER.get();
@@ -460,6 +464,9 @@ public class FireBossEntity extends AbstractSpellCastingMob implements Enemy, IA
                 soulParticles();
             }
         }
+        if (destroyBlockDelay > 0) {
+            --destroyBlockDelay;
+        }
     }
 
     @Override
@@ -467,10 +474,18 @@ public class FireBossEntity extends AbstractSpellCastingMob implements Enemy, IA
         super.customServerAiStep();
         float maxHealth = this.getMaxHealth();
         float currentHealth = this.getHealth();
-        float eruptionHealthStep = maxHealth / (STANCE_BREAK_COUNT + 1);
-        if (currentHealth < maxHealth - eruptionHealthStep * (stanceBreakCounter + 1)) {
-            triggerStanceBreak();
-        } else if (!hasPerformedHalfHealthAttack && currentHealth < maxHealth / 2) {
+        if (stanceBreakCounter == 0) {
+            if (currentHealth < maxHealth * .75f) {
+                triggerStanceBreak();
+                return;
+            }
+        } else if (stanceBreakCounter == 1) {
+            if (currentHealth < maxHealth * .333f) {
+                triggerStanceBreak();
+                return;
+            }
+        }
+        if (!hasPerformedHalfHealthAttack && currentHealth < maxHealth * 0.5f) {
             triggerHalfHealthAttack();
         }
         if (tickCount > 400 && !isDespawning() && this.getTarget() == null && this.tickCount - this.getLastHurtByMobTimestamp() > 200) {
@@ -505,9 +520,9 @@ public class FireBossEntity extends AbstractSpellCastingMob implements Enemy, IA
             // must be below half health already
             // must take 10% of max health as damage
             // distance to 1/3 health therefore is < 10%
-            // thats an acceptable amount of damage to proc
+            // thats an acceptable amount of damage to proc i think
             // triggering soul mode stance break is gonna be cinematic
-            setHealth(Math.max(10, Math.min(getHealth(), getMaxHealth() * .33f - 10)));
+            setHealth(Math.max(10, Math.min(getHealth(), getMaxHealth() * .33f - 1)));
             stopHalfHealthAttack();
             return;
         }
@@ -540,7 +555,7 @@ public class FireBossEntity extends AbstractSpellCastingMob implements Enemy, IA
             MagicFireball fireball = new MagicFireball(level, this);
 
             //TODO: real stats
-            fireball.setDamage((float) (getAttributeValue(Attributes.ATTACK_DAMAGE) * 5));
+            fireball.setDamage((float) (getAttributeValue(Attributes.ATTACK_DAMAGE) * 8));
             fireball.setExplosionRadius(20);
             Vec3 origin = position().subtract(0, fireball.getBbHeight() / 2, 0).add(0, this.getBoundingBox().getYsize() * 1.25, 0);
             Vec3 trajectory = getTarget() == null ? this.getForward() : getTarget().position().subtract(origin).normalize();
@@ -784,10 +799,10 @@ public class FireBossEntity extends AbstractSpellCastingMob implements Enemy, IA
 
     public static AttributeSupplier.Builder prepareAttributes() {
         return LivingEntity.createLivingAttributes()
-                .add(Attributes.ATTACK_DAMAGE, 8.0)
-                .add(AttributeRegistry.SPELL_POWER, 1.15)
+                .add(Attributes.ATTACK_DAMAGE, 10.0)
+                .add(AttributeRegistry.SPELL_POWER, 1.25)
                 .add(Attributes.ARMOR, 15)
-                .add(AttributeRegistry.SPELL_RESIST, 1.20)
+                .add(AttributeRegistry.SPELL_RESIST, 1.25)
                 .add(AttributeRegistry.FIRE_MAGIC_RESIST, 1.5)
                 .add(Attributes.MAX_HEALTH, 1000)
                 .add(Attributes.KNOCKBACK_RESISTANCE, 0.8)
@@ -827,6 +842,12 @@ public class FireBossEntity extends AbstractSpellCastingMob implements Enemy, IA
     public void playAnimation(String animationId) {
         animationToPlay = RawAnimation.begin().thenPlay(animationId);
         canAnimateOver = animationId.equals("fire_boss_spawn") || animationId.equals("summon_fiery_daggers");
+        stopHeadAnimation = animationId.equals("fire_boss_break_stance") || animationId.equals("fire_boss_death");
+    }
+
+    @Override
+    public boolean shouldAlwaysAnimateHead() {
+        return !stopHeadAnimation;
     }
 
     private PlayState predicate(AnimationState<FireBossEntity> animationEvent) {
@@ -885,10 +906,13 @@ public class FireBossEntity extends AbstractSpellCastingMob implements Enemy, IA
         if (isSoulMode()) {
             pAmount *= 0.4f;
         }
-        if (pSource.is(DamageTypes.IN_WALL)) {
-            if (--this.destroyBlockDelay <= 0) {
-                Utils.doMobBreakSuffocatingBlocks(this);
-            }
+        // damage limiter
+        var limit = getMaxHealth() * 0.025f;
+        if (pAmount > limit) {
+            pAmount = limit + (pAmount - limit) * .3f; // damage about limit has .3x multiplier applied
+        }
+        if (pSource.is(DamageTypes.IN_WALL) && this.destroyBlockDelay <= 0) {
+            Utils.doMobBreakSuffocatingBlocks(this);
             destroyBlockDelay = 40;
         }
 
