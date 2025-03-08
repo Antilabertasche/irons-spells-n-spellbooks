@@ -14226,7 +14226,7 @@
 							"easing": "easeInOutQuad"
 						},
 						"4.5": {
-							"vector": [0, 0, -40],
+							"vector": [0, 0, -25],
 							"easing": "easeInOutQuad"
 						},
 						"5.5": {

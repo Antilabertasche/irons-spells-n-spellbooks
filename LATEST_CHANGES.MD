@@ -39,6 +39,7 @@
 
 ### API
 - Removed TransformStack#pushRotationWithBase
+- Added `guiding_bolt_immune` tag for projectiles 
 
 ## Patreon Specific
 ### Additions
