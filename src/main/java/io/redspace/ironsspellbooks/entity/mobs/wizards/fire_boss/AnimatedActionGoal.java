@@ -21,6 +21,7 @@ public abstract class AnimatedActionGoal<T extends Mob & IMagicEntity & IAnimate
 
     @Override
     public final boolean canUse() {
+        //fixme: do delay first
         return canStartAction() && delay-- <= 0;
     }
 

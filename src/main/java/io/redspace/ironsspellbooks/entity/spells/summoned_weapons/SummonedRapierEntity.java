@@ -3,6 +3,7 @@ package io.redspace.ironsspellbooks.entity.spells.summoned_weapons;
 import io.redspace.ironsspellbooks.capabilities.magic.MagicManager;
 import io.redspace.ironsspellbooks.entity.mobs.goals.melee.AttackAnimationData;
 import io.redspace.ironsspellbooks.entity.mobs.wizards.GenericAnimatedWarlockAttackGoal;
+import io.redspace.ironsspellbooks.registries.EntityRegistry;
 import io.redspace.ironsspellbooks.util.ParticleHelper;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -11,7 +12,10 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.PathfinderMob;
+import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -22,9 +26,21 @@ import java.util.List;
 import java.util.Optional;
 
 public class SummonedRapierEntity extends SummonedWeaponEntity {
+    public static AttributeSupplier.Builder prepareAttributes() {
+        return LivingEntity.createLivingAttributes()
+                .add(Attributes.ATTACK_KNOCKBACK, 1.0)
+                .add(Attributes.ATTACK_DAMAGE, 5.0)
+                .add(Attributes.MAX_HEALTH, 20.0)
+                .add(Attributes.FOLLOW_RANGE, 40.0)
+                .add(Attributes.FLYING_SPEED, 2.2)
+                .add(Attributes.ENTITY_INTERACTION_RANGE, 4)
+                .add(Attributes.MOVEMENT_SPEED, .2);
+
+    }
+
     @Override
     public GenericAnimatedWarlockAttackGoal<? extends SummonedWeaponEntity> makeAttackGoal() {
-        return new GenericAnimatedWarlockAttackGoal<>(this, 2, 0, 20)
+        return new GenericAnimatedWarlockAttackGoal<>(this, 1.5, 0, 20)
                 .setMoveset(List.of(
                         new AttackAnimationData(40, "summoned_sword_multistab", 20, 26, 32)
                 ));
@@ -34,6 +50,11 @@ public class SummonedRapierEntity extends SummonedWeaponEntity {
         super(pEntityType, pLevel);
     }
 
+    public SummonedRapierEntity(Level level, LivingEntity owner) {
+        this(EntityRegistry.SUMMONED_RAPIER.get(), level);
+        setSummoner(owner);
+    }
+
     @Override
     public boolean hurt(DamageSource pSource, float pAmount) {
         if (!level.isClientSide && pSource.getEntity() != null && !pSource.is(DamageTypeTags.BYPASSES_INVULNERABILITY)) {
@@ -41,8 +62,8 @@ public class SummonedRapierEntity extends SummonedWeaponEntity {
             if (shouldIgnoreDamage(pSource)) {
                 return false;
             }
-            // 20% chance to sidestep entity-caused damage
-            if (random.nextFloat() < 0.3f) {
+            // 40% chance to sidestep entity-caused damage
+            if (random.nextFloat() < 0.4f) {
                 performSidestep(pSource.getEntity());
                 return false;
             }

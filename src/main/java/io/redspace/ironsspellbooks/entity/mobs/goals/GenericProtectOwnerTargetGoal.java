@@ -1,5 +1,6 @@
 package io.redspace.ironsspellbooks.entity.mobs.goals;
 
+import io.redspace.ironsspellbooks.entity.mobs.IMagicSummon;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.goal.target.TargetGoal;
@@ -33,7 +34,9 @@ public class GenericProtectOwnerTargetGoal extends TargetGoal {
             return false;
         } else {
             if (--intervalToCheck <= 0) {
-                var entities = owner.level.getEntitiesOfClass(Mob.class, owner.getBoundingBox().inflate(16, 8, 16), mob -> mob.getTarget() != null && mob.getTarget().getUUID().equals(owner.getUUID()));
+                var entities = owner.level.getEntitiesOfClass(Mob.class, owner.getBoundingBox().inflate(16, 8, 16), mob -> mob.getTarget() != null &&
+                        (mob.getTarget().getUUID().equals(owner.getUUID()) || (mob.getTarget() instanceof IMagicSummon summon && summon.getSummoner() != null && summon.getSummoner().getUUID().equals(owner.getUUID())))
+                );
                 if (entities.isEmpty()) {
                     currentIntensity = Math.max(0, currentIntensity - 10);
                     return false;

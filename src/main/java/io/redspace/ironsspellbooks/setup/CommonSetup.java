@@ -23,7 +23,9 @@ import io.redspace.ironsspellbooks.entity.mobs.wizards.priest.PriestEntity;
 import io.redspace.ironsspellbooks.entity.mobs.wizards.pyromancer.PyromancerEntity;
 import io.redspace.ironsspellbooks.entity.spells.root.RootEntity;
 import io.redspace.ironsspellbooks.entity.spells.spectral_hammer.SpectralHammer;
-import io.redspace.ironsspellbooks.entity.spells.summoned_weapons.SummonedWeaponEntity;
+import io.redspace.ironsspellbooks.entity.spells.summoned_weapons.SummonedClaymoreEntity;
+import io.redspace.ironsspellbooks.entity.spells.summoned_weapons.SummonedRapierEntity;
+import io.redspace.ironsspellbooks.entity.spells.summoned_weapons.SummonedSwordEntity;
 import io.redspace.ironsspellbooks.entity.spells.void_tentacle.VoidTentacle;
 import io.redspace.ironsspellbooks.entity.spells.wisp.WispEntity;
 import io.redspace.ironsspellbooks.registries.EntityRegistry;
@@ -87,9 +89,9 @@ public class CommonSetup {
         event.put(EntityRegistry.CULTIST.get(), CultistEntity.prepareAttributes().build());
         event.put(EntityRegistry.FIRE_BOSS.get(), FireBossEntity.prepareAttributes().build());
         event.put(EntityRegistry.CURSED_ARMOR_STAND.get(), CursedArmorStandEntity.prepareAttributes().build());
-        event.put(EntityRegistry.SUMMONED_SWORD.get(), SummonedWeaponEntity.prepareAttributes().build());
-        event.put(EntityRegistry.SUMMONED_CLAYMORE.get(), SummonedWeaponEntity.prepareAttributes().build());
-        event.put(EntityRegistry.SUMMONED_RAPIER.get(), SummonedWeaponEntity.prepareAttributes().build());
+        event.put(EntityRegistry.SUMMONED_SWORD.get(), SummonedSwordEntity.prepareAttributes().build());
+        event.put(EntityRegistry.SUMMONED_CLAYMORE.get(), SummonedClaymoreEntity.prepareAttributes().build());
+        event.put(EntityRegistry.SUMMONED_RAPIER.get(), SummonedRapierEntity.prepareAttributes().build());
     }
 
     @SubscribeEvent

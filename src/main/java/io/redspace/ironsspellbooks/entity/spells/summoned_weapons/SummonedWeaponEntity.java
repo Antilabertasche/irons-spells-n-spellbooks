@@ -93,7 +93,7 @@ public abstract class SummonedWeaponEntity extends AbstractSpellCastingMob imple
     protected void customServerAiStep() {
         super.customServerAiStep();
         if (this.tickCount % 8 == 0) {
-            //fixme: causes crazy motion, not very constistent
+            //fixme: not very consistent
             var owner = getSummoner();
             var target = getTarget();
             var trackEntity = target == null ? owner : target;
@@ -101,6 +101,9 @@ public abstract class SummonedWeaponEntity extends AbstractSpellCastingMob imple
             var f = targetY - getY();
             var force = Math.clamp(f * 0.05, -0.15, 0.15);
             this.setDeltaMovement(this.getDeltaMovement().add(0, force, 0));
+        }
+        if (this.tickCount % 80 == 0) {
+            heal(1);
         }
     }
 
