@@ -1,5 +1,6 @@
 package io.redspace.ironsspellbooks.entity.spells.summoned_weapons;
 
+import io.redspace.ironsspellbooks.api.registry.SpellRegistry;
 import io.redspace.ironsspellbooks.api.spells.AbstractSpell;
 import io.redspace.ironsspellbooks.api.util.Utils;
 import io.redspace.ironsspellbooks.entity.mobs.IAnimatedAttacker;
@@ -105,6 +106,11 @@ public abstract class SummonedWeaponEntity extends AbstractSpellCastingMob imple
         if (this.tickCount % 80 == 0) {
             heal(1);
         }
+    }
+
+    @Override
+    public boolean doHurtTarget(Entity pEntity) {
+        return Utils.doMeleeAttack(this, pEntity, SpellRegistry.SUMMON_SWORDS.get().getDamageSource(this, getSummoner()));
     }
 
     @Override

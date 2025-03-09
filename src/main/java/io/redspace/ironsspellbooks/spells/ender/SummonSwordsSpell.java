@@ -31,7 +31,9 @@ public class SummonSwordsSpell extends AbstractSpell {
     @Override
     public List<MutableComponent> getUniqueInfo(int spellLevel, LivingEntity caster) {
         return List.of(
-                Component.translatable("ui.irons_spellbooks.summon_count", spellLevel)
+                Component.translatable("ui.irons_spellbooks.summon_count", 3),
+                Component.translatable("ui.irons_spellbooks.percent_damage", (int) (100 + getDamageBonus(spellLevel, caster) * 100)),
+                Component.translatable("ui.irons_spellbooks.percent_health", (int) (100 + getHealthBonus(spellLevel, caster) * 100))
         );
     }
 
@@ -44,11 +46,11 @@ public class SummonSwordsSpell extends AbstractSpell {
 
     public SummonSwordsSpell() {
         //todo
-        this.manaCostPerLevel = 10;
+        this.manaCostPerLevel = 15;
         this.baseSpellPower = 1;
         this.spellPowerPerLevel = 2;
         this.castTime = 20;
-        this.baseManaCost = 50;
+        this.baseManaCost = 80;
     }
 
     @Override
@@ -78,14 +80,21 @@ public class SummonSwordsSpell extends AbstractSpell {
         return Optional.of(SoundEvents.EVOKER_CAST_SPELL);
     }
 
+    public double getHealthBonus(int spellLevel, LivingEntity caster) {
+        // 10% extra health for every extra spell power
+        return (getSpellPower(spellLevel, caster) - 1) * .10;
+    }
+
+    public double getDamageBonus(int spellLevel, LivingEntity caster) {
+        // 5% extra damage for every extra spell power
+        return (getSpellPower(spellLevel, caster) - 1) * .05;
+    }
+
     @Override
     public void onCast(Level world, int spellLevel, LivingEntity entity, CastSource castSource, MagicData playerMagicData) {
         int summonTime = 20 * 60 * 10;
-        var spellPower = getSpellPower(spellLevel, entity);
-        // 10% extra health for every spell power
-        AttributeModifier healthModifier = new AttributeModifier(IronsSpellbooks.id("spell_power_health_bonus"), spellPower * .10, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
-        // 5% extra damage for every spell power
-        AttributeModifier damageModifier = new AttributeModifier(IronsSpellbooks.id("spell_power_damage_bonus"), spellPower * .05, AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
+        AttributeModifier healthModifier = new AttributeModifier(IronsSpellbooks.id("spell_power_health_bonus"), getHealthBonus(spellLevel, entity), AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
+        AttributeModifier damageModifier = new AttributeModifier(IronsSpellbooks.id("spell_power_damage_bonus"), getDamageBonus(spellLevel, entity), AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
 
         SummonedWeaponEntity claymore = new SummonedClaymoreEntity(world, entity);
         SummonedWeaponEntity rapier = new SummonedRapierEntity(world, entity);
