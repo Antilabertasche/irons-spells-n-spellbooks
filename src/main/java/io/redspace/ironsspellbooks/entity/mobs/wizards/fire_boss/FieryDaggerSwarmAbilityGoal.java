@@ -32,7 +32,7 @@ public class FieryDaggerSwarmAbilityGoal extends AnimatedActionGoal<FireBossEnti
 
     @Override
     protected int getCooldown() {
-        return 20 * 3 + Utils.random.nextInt(41);
+        return Utils.random.nextIntBetweenInclusive(60, 100);
     }
 
     @Override
