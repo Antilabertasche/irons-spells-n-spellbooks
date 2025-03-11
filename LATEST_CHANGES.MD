@@ -1,8 +1,10 @@
 ### Additions
 - Added the Citadel structure
 - Added Fire Boss
-- Added Fire Arrow Spell
-- Added Raise Hell Spell
+- Spells:
+  - Added Fire Arrow Spell
+  - Added Raise Hell Spell
+  - Added Summon Swords Spells
 - Items:
   - Added Hellrazor
   - Added Signet of the Betrayer
@@ -33,6 +35,9 @@
   - No longer requires diamond tools
   - Nerfed Drops
 - Rebalance ink drops across all loot
+  - Lower qualities of ink are more plentiful, while higher qualities are more rare
+  - Regular casting mobs (Pyromancer, Apothecarist, etc) now cannot drop legendary ink
+- Summons now preemptively scan for and attack creatures that target their owner
 
 ### Fixes
 - Melee mobs can no longer hit through blocks
