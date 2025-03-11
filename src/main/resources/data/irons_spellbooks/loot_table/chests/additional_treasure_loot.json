@@ -80,7 +80,7 @@
       "entries": [
         {
           "type": "minecraft:loot_table",
-          "value": "irons_spellbooks:magic_items/ink_great"
+          "value": "irons_spellbooks:magic_items/great_ink"
         }
       ],
       "conditions": [

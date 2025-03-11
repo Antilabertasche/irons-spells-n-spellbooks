@@ -59,7 +59,7 @@
         },
         {
           "type": "minecraft:loot_table",
-          "value": "irons_spellbooks:magic_items/ink_reward"
+          "value": "irons_spellbooks:magic_items/reward_ink"
         }
       ],
       "rolls": 3

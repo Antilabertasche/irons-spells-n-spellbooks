@@ -68,7 +68,7 @@
       "entries": [
         {
           "type": "minecraft:loot_table",
-          "value": "irons_spellbooks:magic_items/ink_good"
+          "value": "irons_spellbooks:magic_items/good_ink"
         }
       ],
       "conditions": [
