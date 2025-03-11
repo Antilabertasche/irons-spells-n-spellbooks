@@ -737,5 +737,15 @@
       "irons_spellbooks:tower_guard_swing_02",
       "irons_spellbooks:tower_guard_swing_03"
     ]
+  },
+  "spell.summon_swords.charge": {
+    "sounds": [
+      "irons_spellbooks:ender_charge"
+    ]
+  },
+  "spell.summon_swords.cast": {
+    "sounds": [
+      "irons_spellbooks:void_touched_twinblades"
+    ]
   }
 }

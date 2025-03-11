@@ -5,16 +5,17 @@ import io.redspace.ironsspellbooks.api.config.DefaultConfig;
 import io.redspace.ironsspellbooks.api.magic.MagicData;
 import io.redspace.ironsspellbooks.api.registry.SchoolRegistry;
 import io.redspace.ironsspellbooks.api.spells.*;
+import io.redspace.ironsspellbooks.api.util.Utils;
 import io.redspace.ironsspellbooks.entity.spells.summoned_weapons.SummonedClaymoreEntity;
 import io.redspace.ironsspellbooks.entity.spells.summoned_weapons.SummonedRapierEntity;
 import io.redspace.ironsspellbooks.entity.spells.summoned_weapons.SummonedSwordEntity;
 import io.redspace.ironsspellbooks.entity.spells.summoned_weapons.SummonedWeaponEntity;
 import io.redspace.ironsspellbooks.registries.MobEffectRegistry;
+import io.redspace.ironsspellbooks.registries.SoundRegistry;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
-import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
@@ -45,7 +46,6 @@ public class SummonSwordsSpell extends AbstractSpell {
             .build();
 
     public SummonSwordsSpell() {
-        //todo
         this.manaCostPerLevel = 15;
         this.baseSpellPower = 1;
         this.spellPowerPerLevel = 2;
@@ -70,14 +70,12 @@ public class SummonSwordsSpell extends AbstractSpell {
 
     @Override
     public Optional<SoundEvent> getCastStartSound() {
-        //todo
-        return Optional.of(SoundEvents.EVOKER_PREPARE_SUMMON);
+        return Optional.of(SoundRegistry.SUMMONED_SWORDS_CHARGE.get());
     }
 
     @Override
     public Optional<SoundEvent> getCastFinishSound() {
-        //todo
-        return Optional.of(SoundEvents.EVOKER_CAST_SPELL);
+        return Optional.of(SoundRegistry.SUMMONED_SWORDS_CAST.get());
     }
 
     public double getHealthBonus(int spellLevel, LivingEntity caster) {
@@ -102,16 +100,17 @@ public class SummonSwordsSpell extends AbstractSpell {
 
         List<SummonedWeaponEntity> weapons = List.of(claymore, rapier, sword);
         weapons.forEach(weapon -> {
-            weapon.moveTo(entity.position().add(0, 0.25, 0));
-            weapon.getAttribute(Attributes.MAX_HEALTH).addPermanentModifier(healthModifier);
+            weapon.moveTo(entity.position().add(0, 1.2, 0).add(Utils.getRandomVec3(1)));
             weapon.getAttribute(Attributes.ATTACK_DAMAGE).addPermanentModifier(damageModifier);
+            weapon.getAttribute(Attributes.MAX_HEALTH).addPermanentModifier(healthModifier);
+            weapon.setHealth(weapon.getMaxHealth());
             weapon.addEffect(new MobEffectInstance(MobEffectRegistry.SUMMONED_SWORD_TIMER, summonTime, 0, false, false, true));
 
             world.addFreshEntity(weapon);
         });
 
 
-        int effectAmplifier = spellLevel - 1;
+        int effectAmplifier = 3;
         if (entity.hasEffect(MobEffectRegistry.SUMMONED_SWORD_TIMER)) {
             effectAmplifier += entity.getEffect(MobEffectRegistry.SUMMONED_SWORD_TIMER).getAmplifier() + 1;
         }
