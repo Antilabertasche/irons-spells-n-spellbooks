@@ -87,6 +87,8 @@ public class FireBossEntity extends AbstractSpellCastingMob implements Enemy, IA
     public static final byte CLIENT_START_TRACKING = 1;
     public static final byte PROC_HALF_HEALTH_TIMER = 2;
     public static final byte STOP_HALF_HEALTH_TIMER = 3;
+    public static final byte START_MUSIC = 4;
+    public static final byte STOP_MUSIC = 5;
     /**
      * delay in seconds the boss will wait outside of combat until beginning despawn sequence
      */
@@ -105,10 +107,14 @@ public class FireBossEntity extends AbstractSpellCastingMob implements Enemy, IA
             }
             case CLIENT_START_TRACKING -> {
                 FogManager.createEvent(this, new FogManager.FogEvent(Optional.empty(), true));
-                MusicManager.createEvent(this, new FireBossMusicHandler());
+                if (!isSpawning()) {
+                    MusicManager.createEvent(this, new FireBossMusicHandler());
+                }
             }
             case PROC_HALF_HEALTH_TIMER -> this.halfHealthTimer = HALF_HEALTH_ANIM_DURATION;
             case STOP_HALF_HEALTH_TIMER -> this.halfHealthTimer = 0;
+            case START_MUSIC -> MusicManager.createEvent(this, new FireBossMusicHandler(true));
+            case STOP_MUSIC -> MusicManager.stopEvent(this.uuid);
         }
     }
 
@@ -595,10 +601,14 @@ public class FireBossEntity extends AbstractSpellCastingMob implements Enemy, IA
     }
 
     private void handleSpawnSequence() {
+
         int animProgress = SPAWN_ANIM_TIME + SPAWN_DELAY - spawnTimer; // counts up to max (whereas timer counts down from max)
         float walkProgress = getSpawnWalkPercent(0); // 0-1f, percent progress of the spawn animation from starting to walk to finishing animation
         float worldZOffset = Mth.lerp(walkProgress, -60 / 16f * getScale(), 0);
         Vec3 position = this.position().add(new Vec3(0, 0, worldZOffset).yRot(-this.getYRot() * Mth.DEG_TO_RAD));
+        if (!level.isClientSide && animProgress == 65) {
+            this.serverTriggerEvent(START_MUSIC);
+        }
         if (animProgress == SPAWN_DELAY) {
             if (!level.isClientSide) {
                 //smoke to step out of
@@ -691,6 +701,7 @@ public class FireBossEntity extends AbstractSpellCastingMob implements Enemy, IA
             this.castComplete();
             this.attackGoal.stop();
             this.serverTriggerAnimation("fire_boss_death");
+            this.serverTriggerEvent(STOP_MUSIC);
             this.playSound(SoundRegistry.FIRE_BOSS_DEATH.get(), 5, 1);
             Vec3 vec3 = this.getBoundingBox().getCenter();
             MagicManager.spawnParticles(level, ParticleRegistry.EMBEROUS_ASH_PARTICLE.get(), vec3.x, vec3.y, vec3.z, 25, 0.2, 0.2, 0.2, 0.12, false);
