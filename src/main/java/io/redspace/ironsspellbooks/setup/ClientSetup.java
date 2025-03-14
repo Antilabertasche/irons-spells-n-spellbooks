@@ -77,6 +77,7 @@ import io.redspace.ironsspellbooks.entity.spells.thunderstep.ThunderstepProjecti
 import io.redspace.ironsspellbooks.entity.spells.void_tentacle.VoidTentacleRenderer;
 import io.redspace.ironsspellbooks.entity.spells.wisp.WispRenderer;
 import io.redspace.ironsspellbooks.fluids.SimpleClientFluidType;
+import io.redspace.ironsspellbooks.fluids.SimpleTintedClientFluidType;
 import io.redspace.ironsspellbooks.gui.arcane_anvil.ArcaneAnvilScreen;
 import io.redspace.ironsspellbooks.gui.inscription_table.InscriptionTableScreen;
 import io.redspace.ironsspellbooks.gui.scroll_forge.ScrollForgeScreen;
@@ -140,7 +141,11 @@ public class ClientSetup {
         event.registerItem(new PyriumStaffClientExtensions(), ItemRegistry.PYRIUM_STAFF.get());
 
         event.registerFluidType(new SimpleClientFluidType(IronsSpellbooks.id("block/blood")), FluidRegistry.BLOOD_TYPE);
-
+        event.registerFluidType(new SimpleTintedClientFluidType(ResourceLocation.fromNamespaceAndPath("neoforge","block/milk_still"), 0xFF222222), FluidRegistry.COMMON_INK_TYPE);
+        event.registerFluidType(new SimpleTintedClientFluidType(ResourceLocation.fromNamespaceAndPath("neoforge","block/milk_still"), 0xFF124300), FluidRegistry.UNCOMMON_INK_TYPE);
+        event.registerFluidType(new SimpleTintedClientFluidType(ResourceLocation.fromNamespaceAndPath("neoforge","block/milk_still"), 0xFF0f3844), FluidRegistry.RARE_INK_TYPE);
+        event.registerFluidType(new SimpleTintedClientFluidType(ResourceLocation.fromNamespaceAndPath("neoforge","block/milk_still"), 0xFFa52ea0), FluidRegistry.EPIC_INK_TYPE);
+        event.registerFluidType(new SimpleTintedClientFluidType(ResourceLocation.fromNamespaceAndPath("neoforge","block/milk_still"), 0xFFfcaf1c), FluidRegistry.LEGENDARY_INK_TYPE);
     }
 
     @SubscribeEvent

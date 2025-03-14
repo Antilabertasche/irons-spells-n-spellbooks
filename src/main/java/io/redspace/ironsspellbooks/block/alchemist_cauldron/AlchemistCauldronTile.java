@@ -261,6 +261,7 @@ public class AlchemistCauldronTile extends BlockEntity implements WorldlyContain
     }
 
     public int getItemWaterColor(ItemStack itemStack) {
+        // todo: create common sync for ink colors n stuff
         if (this.getLevel() == null)
             return 0;
         if (itemStack.getItem() instanceof SimpleElixir simpleElixir)
