@@ -747,5 +747,35 @@
     "sounds": [
       "irons_spellbooks:void_touched_twinblades"
     ]
+  },
+  "music.fire_boss.melody_a": {
+    "sounds": [
+      "irons_spellbooks:fire_boss/music/melody_a"
+    ]
+  },
+  "music.fire_boss.melody_b": {
+    "sounds": [
+      "irons_spellbooks:fire_boss/music/melody_b"
+    ]
+  },
+  "music.fire_boss.bells_a": {
+    "sounds": [
+      "irons_spellbooks:fire_boss/music/bells_a"
+    ]
+  },
+  "music.fire_boss.bells_b": {
+    "sounds": [
+      "irons_spellbooks:fire_boss/music/bells_b"
+    ]
+  },
+  "music.fire_boss.backtrack": {
+    "sounds": [
+      "irons_spellbooks:fire_boss/music/backtrack"
+    ]
+  },
+  "music.fire_boss.drums": {
+    "sounds": [
+      "irons_spellbooks:fire_boss/music/drums"
+    ]
   }
 }

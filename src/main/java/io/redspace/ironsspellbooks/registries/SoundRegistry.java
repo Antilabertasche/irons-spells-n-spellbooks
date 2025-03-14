@@ -132,6 +132,13 @@ public class SoundRegistry {
     public static DeferredHolder<SoundEvent, SoundEvent> FIRE_BOSS_TRANSITION_SOUL = registerSoundEvent("entity.fire_boss.enter_soul");
     public static DeferredHolder<SoundEvent, SoundEvent> FIRE_BOSS_SUMMON_SCYTHE = registerSoundEvent("entity.fire_boss.summon_scythe");
     public static DeferredHolder<SoundEvent, SoundEvent> FIRE_BOSS_FIREBALL = registerSoundEvent("entity.fire_boss.fireball");
+    public static DeferredHolder<SoundEvent, SoundEvent> MUSIC_FIRE_BOSS_MELODY_A = registerSoundEvent("music.fire_boss.melody_a");
+    public static DeferredHolder<SoundEvent, SoundEvent> MUSIC_FIRE_BOSS_MELODY_B = registerSoundEvent("music.fire_boss.melody_b");
+    public static DeferredHolder<SoundEvent, SoundEvent> MUSIC_FIRE_BOSS_BELLS_A = registerSoundEvent("music.fire_boss.bells_a");
+    public static DeferredHolder<SoundEvent, SoundEvent> MUSIC_FIRE_BOSS_BELLS_B = registerSoundEvent("music.fire_boss.bells_b");
+    public static DeferredHolder<SoundEvent, SoundEvent> MUSIC_FIRE_BOSS_BACKTRACK = registerSoundEvent("music.fire_boss.backtrack");
+    public static DeferredHolder<SoundEvent, SoundEvent> MUSIC_FIRE_BOSS_DRUMS = registerSoundEvent("music.fire_boss.drums");
+
 
     public static DeferredHolder<SoundEvent, SoundEvent> DEAD_KING_SWING = registerSoundEvent("entity.dead_king.attack_swing");
     public static DeferredHolder<SoundEvent, SoundEvent> DEAD_KING_SLAM = registerSoundEvent("entity.dead_king.attack_slam");

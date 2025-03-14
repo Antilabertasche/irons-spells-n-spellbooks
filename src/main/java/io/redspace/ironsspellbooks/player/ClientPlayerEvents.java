@@ -9,6 +9,7 @@ import io.redspace.ironsspellbooks.api.spells.CastSource;
 import io.redspace.ironsspellbooks.api.spells.CastType;
 import io.redspace.ironsspellbooks.api.spells.ISpellContainer;
 import io.redspace.ironsspellbooks.api.spells.SpellData;
+import io.redspace.ironsspellbooks.api.util.MusicManager;
 import io.redspace.ironsspellbooks.api.util.FogManager;
 import io.redspace.ironsspellbooks.api.util.Utils;
 import io.redspace.ironsspellbooks.capabilities.magic.SyncedSpellData;
@@ -17,7 +18,6 @@ import io.redspace.ironsspellbooks.effect.AbyssalShroudEffect;
 import io.redspace.ironsspellbooks.effect.AscensionEffect;
 import io.redspace.ironsspellbooks.effect.CustomDescriptionMobEffect;
 import io.redspace.ironsspellbooks.effect.guiding_bolt.GuidingBoltManager;
-import io.redspace.ironsspellbooks.entity.mobs.dead_king_boss.DeadKingMusicManager;
 import io.redspace.ironsspellbooks.item.Scroll;
 import io.redspace.ironsspellbooks.item.SpellBook;
 import io.redspace.ironsspellbooks.network.casting.CancelCastPacket;
@@ -79,7 +79,7 @@ public class ClientPlayerEvents {
     @SubscribeEvent
     public static void onPlayerLogOut(ClientPlayerNetworkEvent.LoggingOut event) {
         IronsSpellbooks.LOGGER.debug("ClientPlayerNetworkEvent onPlayerLogOut");
-        DeadKingMusicManager.hardStop();
+        MusicManager.clear();
         GuidingBoltManager.handleClientLogout();
         ClientMagicData.spellSelectionManager = null;
         FogManager.clear();
