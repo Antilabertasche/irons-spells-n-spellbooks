@@ -35,6 +35,8 @@ public class FluidRegistry {
                     .descriptionId("block.irons_spellbooks.epic_ink")));
     public static final DeferredHolder<FluidType, FluidType> LEGENDARY_INK_TYPE = FLUID_TYPES.register("legendary_ink", () -> new FluidType(FluidType.Properties.create()
                     .descriptionId("block.irons_spellbooks.legendary_ink")));
+    public static final DeferredHolder<FluidType, FluidType> POTION_FLUID_TYPE = FLUID_TYPES.register("potion", () -> new FluidType(FluidType.Properties.create()
+            .descriptionId("block.irons_spellbooks.potion"))); // todo: descriptionid for this one?
 
     public static final DeferredHolder<Fluid, NoopFluid> BLOOD = registerNoop("blood", BLOOD_TYPE::value);
     public static final DeferredHolder<Fluid, NoopFluid> COMMON_INK = registerNoop("common_ink", COMMON_INK_TYPE::value);
@@ -42,6 +44,7 @@ public class FluidRegistry {
     public static final DeferredHolder<Fluid, NoopFluid> RARE_INK = registerNoop("rare_ink", RARE_INK_TYPE::value);
     public static final DeferredHolder<Fluid, NoopFluid> EPIC_INK = registerNoop("epic_ink", EPIC_INK_TYPE::value);
     public static final DeferredHolder<Fluid, NoopFluid> LEGENDARY_INK = registerNoop("legendary_ink", LEGENDARY_INK_TYPE::value);
+    public static final DeferredHolder<Fluid, NoopFluid> POTION_FLUID = registerNoop("potion", POTION_FLUID_TYPE::value);
 
     private static DeferredHolder<Fluid, NoopFluid> registerNoop(String name, Supplier<FluidType> fluidType) {
         DeferredHolder<Fluid, NoopFluid> holder = DeferredHolder.create(Registries.FLUID, IronsSpellbooks.id(name));

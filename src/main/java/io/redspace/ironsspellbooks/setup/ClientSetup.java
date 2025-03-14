@@ -76,6 +76,7 @@ import io.redspace.ironsspellbooks.entity.spells.target_area.TargetAreaRenderer;
 import io.redspace.ironsspellbooks.entity.spells.thunderstep.ThunderstepProjectileRenderer;
 import io.redspace.ironsspellbooks.entity.spells.void_tentacle.VoidTentacleRenderer;
 import io.redspace.ironsspellbooks.entity.spells.wisp.WispRenderer;
+import io.redspace.ironsspellbooks.fluids.PotionClientFluidType;
 import io.redspace.ironsspellbooks.fluids.SimpleClientFluidType;
 import io.redspace.ironsspellbooks.fluids.SimpleTintedClientFluidType;
 import io.redspace.ironsspellbooks.gui.arcane_anvil.ArcaneAnvilScreen;
@@ -146,6 +147,7 @@ public class ClientSetup {
         event.registerFluidType(new SimpleTintedClientFluidType(ResourceLocation.fromNamespaceAndPath("neoforge","block/milk_still"), 0xFF0f3844), FluidRegistry.RARE_INK_TYPE);
         event.registerFluidType(new SimpleTintedClientFluidType(ResourceLocation.fromNamespaceAndPath("neoforge","block/milk_still"), 0xFFa52ea0), FluidRegistry.EPIC_INK_TYPE);
         event.registerFluidType(new SimpleTintedClientFluidType(ResourceLocation.fromNamespaceAndPath("neoforge","block/milk_still"), 0xFFfcaf1c), FluidRegistry.LEGENDARY_INK_TYPE);
+        event.registerFluidType(new PotionClientFluidType(ResourceLocation.withDefaultNamespace("block/water_still")), FluidRegistry.POTION_FLUID_TYPE);
     }
 
     @SubscribeEvent
