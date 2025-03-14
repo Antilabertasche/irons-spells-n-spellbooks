@@ -10,62 +10,54 @@ import net.minecraft.sounds.SoundSource;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.function.Function;
 
 public class FireBossMusicHandler implements IMusicHandler {
-
     enum Instrument {
-        DRUMS_A(new FadeableSoundInstance(SoundRegistry.MUSIC_FIRE_BOSS_DRUMS_A.get(), SoundSource.RECORDS, false)),
-        DRUMS_B(new FadeableSoundInstance(SoundRegistry.MUSIC_FIRE_BOSS_DRUMS_B.get(), SoundSource.RECORDS, false)),
-        //        DRUMS_C(),
-        BASS_A(new FadeableSoundInstance(SoundRegistry.MUSIC_FIRE_BOSS_BASS_A.get(), SoundSource.RECORDS, false)),
-        //        BASS_B(),
-        //        BASS_C(),
-        CHOIR(new FadeableSoundInstance(SoundRegistry.MUSIC_FIRE_BOSS_CHOIR.get(), SoundSource.RECORDS, false)),
-        ORCHESTRA(new FadeableSoundInstance(SoundRegistry.MUSIC_FIRE_BOSS_ORCHESTRA.get(), SoundSource.RECORDS, false)),
-        //        ORCHESTRA_STABS(),
-        MELODY_A(new FadeableSoundInstance(SoundRegistry.MUSIC_FIRE_BOSS_MELODY.get(), SoundSource.RECORDS, false)),
-        //        MELODY_B(),
-        BELL_A(new FadeableSoundInstance(SoundRegistry.MUSIC_FIRE_BOSS_BELLS_A.get(), SoundSource.RECORDS, false)),
-//        BELL_B(),
-//        REVERSE(),
+        MELODY_A(m -> m.melodyA),
+        MELODY_B(m -> m.melodyB),
+        BELLS_A(m -> m.bellsA),
+        BELLS_B(m -> m.bellsB),
+        DRUMS(m -> m.drums),
+        BACKTRACK(m -> m.backtrack),
         ;
 
-        final FadeableSoundInstance sound;
+        final Function<FireBossMusicHandler, FadeableSoundInstance> sound;
 
-        Instrument(FadeableSoundInstance sound) {
+        Instrument(Function<FireBossMusicHandler, FadeableSoundInstance> sound) {
             this.sound = sound;
         }
     }
 
+
     Instrument[][] MUSIC = {
-            {Instrument.DRUMS_B, Instrument.CHOIR, Instrument.BELL_A},
-            {Instrument.DRUMS_B, Instrument.CHOIR, Instrument.MELODY_A, Instrument.BELL_A},
-            {Instrument.DRUMS_B, Instrument.CHOIR, Instrument.BELL_A},
-            {Instrument.DRUMS_B, Instrument.CHOIR, Instrument.BELL_A},
-            {Instrument.DRUMS_A, Instrument.BASS_A},
-            {Instrument.DRUMS_A, Instrument.BASS_A},
-            {Instrument.DRUMS_A, Instrument.CHOIR, Instrument.ORCHESTRA, Instrument.BASS_A},
-            {Instrument.DRUMS_B, Instrument.CHOIR, Instrument.ORCHESTRA},
-            {Instrument.DRUMS_B, Instrument.CHOIR, Instrument.ORCHESTRA},
-            {Instrument.DRUMS_B, Instrument.CHOIR, Instrument.BELL_A},
-            {Instrument.DRUMS_B, Instrument.CHOIR, Instrument.MELODY_A, Instrument.BELL_A},
-            {Instrument.DRUMS_B, Instrument.CHOIR},
-            {Instrument.DRUMS_B, Instrument.CHOIR},
-            {Instrument.DRUMS_A, Instrument.BASS_A},
-            {Instrument.DRUMS_A, Instrument.BASS_A},
-            {Instrument.DRUMS_A, Instrument.CHOIR, Instrument.ORCHESTRA, Instrument.BASS_A}
+            {Instrument.BELLS_A, /*Instrument.DRUMS,*/ /*Instrument.BACKTRACK,*/ Instrument.MELODY_A},
+            {/*Instrument.DRUMS,*/ Instrument.BACKTRACK},
+            {/*Instrument.BELLS_A,*/ Instrument.DRUMS, Instrument.BACKTRACK, Instrument.MELODY_A},
+            {Instrument.DRUMS, Instrument.BACKTRACK},
+            {Instrument.BELLS_B, Instrument.DRUMS, Instrument.BACKTRACK, Instrument.MELODY_A},
+            {Instrument.DRUMS, Instrument.BACKTRACK},
+            {Instrument.BELLS_B, Instrument.DRUMS, Instrument.BACKTRACK, Instrument.MELODY_B},
+//            {Instrument.DRUMS, Instrument.BACKTRACK},
     };
 
     Set<FadeableSoundInstance> layers = new HashSet<>();
     static int musicIndex;
-    static final Long SECTION_MILIS = 8000L;
-    private long lastMilisPlayed;
-    private long milisStarted;
-
+    static final int SECTION_LENGTH_TICKS = 20 * 8;
+    int timer, runningTicks;
+    boolean starting;
     final SoundManager soundManager;
+
+    FadeableSoundInstance melodyA, melodyB, bellsA, bellsB, backtrack, drums;
 
     public FireBossMusicHandler() {
         this.soundManager = Minecraft.getInstance().getSoundManager();
+        melodyA = new FadeableSoundInstance(SoundRegistry.MUSIC_FIRE_BOSS_MELODY_A.get(), SoundSource.RECORDS, false);
+        melodyB = new FadeableSoundInstance(SoundRegistry.MUSIC_FIRE_BOSS_MELODY_B.get(), SoundSource.RECORDS, false);
+        bellsA = new FadeableSoundInstance(SoundRegistry.MUSIC_FIRE_BOSS_BELLS_A.get(), SoundSource.RECORDS, false);
+        bellsB = new FadeableSoundInstance(SoundRegistry.MUSIC_FIRE_BOSS_BELLS_B.get(), SoundSource.RECORDS, false);
+        drums = new FadeableSoundInstance(SoundRegistry.MUSIC_FIRE_BOSS_DRUMS.get(), SoundSource.RECORDS, false);
+        backtrack = new FadeableSoundInstance(SoundRegistry.MUSIC_FIRE_BOSS_BACKTRACK.get(), SoundSource.RECORDS, false);
     }
 
     private void addLayer(FadeableSoundInstance soundInstance) {
@@ -95,10 +87,11 @@ public class FireBossMusicHandler implements IMusicHandler {
 
     @Override
     public void init() {
-        musicIndex = 0;
-        playCurrentSheet();
-        lastMilisPlayed = System.currentTimeMillis();
-        milisStarted = System.currentTimeMillis();
+        musicIndex = -1;
+//        playCurrentSheet();
+        timer = 0;//SECTION_LENGTH_TICKS - 20;
+        addLayer(melodyB);
+        starting = true;
     }
 
     @Override
@@ -108,25 +101,31 @@ public class FireBossMusicHandler implements IMusicHandler {
 
     @Override
     public void tick() {
-        if (lastMilisPlayed <= System.currentTimeMillis() - SECTION_MILIS) {
-            lastMilisPlayed = System.currentTimeMillis();
+        runningTicks++;
+        if (++timer >= SECTION_LENGTH_TICKS - 1) {
+            timer = 0;
             musicIndex = (musicIndex + 1) % MUSIC.length;
             playCurrentSheet();
         }
     }
 
     private void playCurrentSheet() {
-        IronsSpellbooks.LOGGER.debug("FIRE BOSS MUSIC {}/{}\t{}", musicIndex, MUSIC.length, System.currentTimeMillis() - milisStarted);
+        starting = false;
+        IronsSpellbooks.LOGGER.debug("FIRE BOSS MUSIC {}/{}\t{}", (musicIndex + 1), MUSIC.length, runningTicks / 20.0);
         Instrument[] instruments = MUSIC[musicIndex];
         for (Instrument instrument : instruments) {
             IronsSpellbooks.LOGGER.debug("\tplaying {}", instrument.toString());
-            instrument.sound.unstop(); // sound instances are static and may be in an undefined state due to other bosses // fixme: i think the real solution is don't use static sound references...
-            addLayer(instrument.sound);
+            var sound = instrument.sound.apply(this);
+            sound.unstop();
+            addLayer(sound);
         }
     }
 
     @Override
     public boolean isDone() {
+        if (starting) {
+            return false; // starting
+        }
         for (FadeableSoundInstance soundInstance : layers) {
             if (!soundInstance.isStopped() && soundManager.isActive(soundInstance)) {
                 return false;
