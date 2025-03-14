@@ -68,11 +68,11 @@ public class CommonSetup {
     public static void registerCapabilitiesEvent(RegisterCapabilitiesEvent event) {
         event.registerBlockEntity(Capabilities.FluidHandler.BLOCK, BlockRegistry.ALCHEMIST_CAULDRON_TILE.get(),
                 (be, context) -> {
-                    if (be.fluidHandler == null) {
+                    if (be.fluidCapability == null) {
                         be.refreshCapabilities();
                     }
 
-                    return be.fluidHandler;
+                    return be.fluidCapability;
                 });
     }
 

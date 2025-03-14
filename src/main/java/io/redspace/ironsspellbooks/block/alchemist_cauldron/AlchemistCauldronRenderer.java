@@ -5,9 +5,9 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import io.redspace.ironsspellbooks.IronsSpellbooks;
 import io.redspace.ironsspellbooks.render.RenderHelper;
-import io.redspace.ironsspellbooks.util.MinecraftInstanceHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
+import net.minecraft.client.renderer.BiomeColors;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
@@ -15,16 +15,16 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Display;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.alchemy.Potion;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
+import net.neoforged.neoforge.fluids.FluidStack;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
@@ -40,9 +40,9 @@ public class AlchemistCauldronRenderer implements BlockEntityRenderer<AlchemistC
 
     @Override
     public void render(AlchemistCauldronTile cauldron, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight, int packedOverlay) {
-        int waterLevel = cauldron.getLiquidLevel();
+        int waterLevel = cauldron.getFluidAmount();
 
-        float waterOffset = Mth.lerp(waterLevel / (float) AlchemistCauldronTile.MAX_LEVELS, .25f, .9f);
+        float waterOffset = Mth.lerp(waterLevel / 1000f, .25f, .9f);
 
         if (waterLevel > 0) {
             renderWater(cauldron, poseStack, bufferSource, packedLight, waterOffset);
@@ -64,28 +64,30 @@ public class AlchemistCauldronRenderer implements BlockEntityRenderer<AlchemistC
 
             }
         }
-        MinecraftInstanceHelper.ifPlayerPresent(player -> {
-            if (Math.abs(player.getX() - cauldron.getBlockPos().getX()) < 5 && Math.abs(player.getY() - cauldron.getBlockPos().getY()) < 5 && Math.abs(player.getZ() - cauldron.getBlockPos().getZ()) < 5)
-                if (player.isCrouching()) {
-                    for (int i = 0; i < cauldron.outputItems.size(); i++) {
-                        var itemStack = cauldron.outputItems.get(i);
-                        if (!itemStack.isEmpty()) {
-                            var component = Component.translatable(itemStack.getDescriptionId());
-                            if (itemStack.has(DataComponents.POTION_CONTENTS)) {
-                                var contents = itemStack.get(DataComponents.POTION_CONTENTS);
-                                var itr = contents.getAllEffects().iterator();
-                                if (itr.hasNext()) {
-                                    var primaryEffect = itr.next();
-                                    if (primaryEffect.getAmplifier() > 0) {
-                                        component.append(Component.literal(String.format(" (%s)", simpleRomanNumeral(primaryEffect.getAmplifier() + 1))));
-                                    }
-                                }
-                            }
-                            renderWorldText(itemStack, component, Display.TextDisplay.Align.LEFT, new Vec3(0.5, 1.1 + i * .25, 0.5), poseStack, bufferSource, packedLight, partialTick);
-                        }
-                    }
-                }
-        });
+        //fixme: alchemist cauldron 2
+
+//        MinecraftInstanceHelper.ifPlayerPresent(player -> {
+//            if (Math.abs(player.getX() - cauldron.getBlockPos().getX()) < 5 && Math.abs(player.getY() - cauldron.getBlockPos().getY()) < 5 && Math.abs(player.getZ() - cauldron.getBlockPos().getZ()) < 5)
+//                if (player.isCrouching()) {
+//                    for (int i = 0; i < cauldron.outputItems.size(); i++) {
+//                        var itemStack = cauldron.outputItems.get(i);
+//                        if (!itemStack.isEmpty()) {
+//                            var component = Component.translatable(itemStack.getDescriptionId());
+//                            if (itemStack.has(DataComponents.POTION_CONTENTS)) {
+//                                var contents = itemStack.get(DataComponents.POTION_CONTENTS);
+//                                var itr = contents.getAllEffects().iterator();
+//                                if (itr.hasNext()) {
+//                                    var primaryEffect = itr.next();
+//                                    if (primaryEffect.getAmplifier() > 0) {
+//                                        component.append(Component.literal(String.format(" (%s)", simpleRomanNumeral(primaryEffect.getAmplifier() + 1))));
+//                                    }
+//                                }
+//                            }
+//                            renderWorldText(itemStack, component, Display.TextDisplay.Align.LEFT, new Vec3(0.5, 1.1 + i * .25, 0.5), poseStack, bufferSource, packedLight, partialTick);
+//                        }
+//                    }
+//                }
+//        });
     }
 
     private String simpleRomanNumeral(int num) {
@@ -189,7 +191,7 @@ public class AlchemistCauldronRenderer implements BlockEntityRenderer<AlchemistC
 
     private void renderWater(AlchemistCauldronTile cauldron, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight, float waterOffset) {
         VertexConsumer consumer = bufferSource.getBuffer(RenderType.beaconBeam(new ResourceLocation(IronsSpellbooks.MODID, "textures/block/water_still.png"), true));
-        long color = cauldron.getAverageWaterColor();
+        long color = getAverageWaterColor(cauldron);
         var rgb = colorFromLong(color);
 
         Matrix4f pose = poseStack.last().pose();
@@ -209,6 +211,34 @@ public class AlchemistCauldronRenderer implements BlockEntityRenderer<AlchemistC
         consumer.addVertex(pose, 0, waterOffset, 0).setColor(rgb.x(), rgb.y(), rgb.z(), 1f).setUv(min_u, min_v).setOverlay(OverlayTexture.NO_OVERLAY).setLight(packedLight).setNormal(0, 1, 0);
         consumer.addVertex(pose, 0, waterOffset, 1).setColor(rgb.x(), rgb.y(), rgb.z(), 1f).setUv(min_u, max_v).setOverlay(OverlayTexture.NO_OVERLAY).setLight(packedLight).setNormal(0, 1, 0);
         consumer.addVertex(pose, 1, waterOffset, 1).setColor(rgb.x(), rgb.y(), rgb.z(), 1f).setUv(max_u, max_v).setOverlay(OverlayTexture.NO_OVERLAY).setLight(packedLight).setNormal(0, 1, 0);
+    }
+
+    private int getAverageWaterColor(AlchemistCauldronTile tile) {
+        float f = 0.0F;
+        float f1 = 0.0F;
+        float f2 = 0.0F;
+
+        int i = 0;
+        int waterColor = BiomeColors.getAverageWaterColor(tile.getLevel(), tile.getBlockPos());
+
+        for (FluidStack fluid : tile.fluidInventory.fluids()) {
+            int k = waterColor;
+
+            // fixme: alchemist cauldron 2 (blood hardcode n stuff)
+            IClientFluidTypeExtensions clientFluid = IClientFluidTypeExtensions.of(fluid.getFluid());
+            if (clientFluid.getTintColor() != 0xFFFFFFFF) {
+                k = clientFluid.getTintColor();
+            }
+            f += (float) ((k >> 16 & 255)) / 255.0F;
+            f1 += (float) ((k >> 8 & 255)) / 255.0F;
+            f2 += (float) ((k >> 0 & 255)) / 255.0F;
+            i++;
+        }
+
+        f = f / (float) i * 255.0F;
+        f1 = f1 / (float) i * 255.0F;
+        f2 = f2 / (float) i * 255.0F;
+        return (int) f << 16 | (int) f1 << 8 | (int) f2;
     }
 
 //    float lastv;
