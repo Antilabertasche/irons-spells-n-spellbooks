@@ -76,6 +76,7 @@ import io.redspace.ironsspellbooks.entity.spells.target_area.TargetAreaRenderer;
 import io.redspace.ironsspellbooks.entity.spells.thunderstep.ThunderstepProjectileRenderer;
 import io.redspace.ironsspellbooks.entity.spells.void_tentacle.VoidTentacleRenderer;
 import io.redspace.ironsspellbooks.entity.spells.wisp.WispRenderer;
+import io.redspace.ironsspellbooks.fluids.SimpleClientFluidType;
 import io.redspace.ironsspellbooks.gui.arcane_anvil.ArcaneAnvilScreen;
 import io.redspace.ironsspellbooks.gui.inscription_table.InscriptionTableScreen;
 import io.redspace.ironsspellbooks.gui.scroll_forge.ScrollForgeScreen;
@@ -137,6 +138,9 @@ public class ClientSetup {
     public static void registerClientExtensions(RegisterClientExtensionsEvent event) {
         event.registerItem(new ClientStaffItemExtensions(), ItemRegistry.getIronsItems().stream().filter(item -> item.get() instanceof StaffItem staffItem && !staffItem.hasCustomRendering()).map(holder -> (Item) holder.get()).toArray(Item[]::new));
         event.registerItem(new PyriumStaffClientExtensions(), ItemRegistry.PYRIUM_STAFF.get());
+
+        event.registerFluidType(new SimpleClientFluidType(IronsSpellbooks.id("block/blood")), FluidRegistry.BLOOD_TYPE);
+
     }
 
     @SubscribeEvent
