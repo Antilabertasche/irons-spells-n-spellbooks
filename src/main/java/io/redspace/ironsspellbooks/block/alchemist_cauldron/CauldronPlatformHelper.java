@@ -4,6 +4,7 @@ import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.level.Level;
+import net.neoforged.neoforge.fluids.FluidStack;
 
 import java.util.function.Predicate;
 
@@ -12,6 +13,10 @@ public class CauldronPlatformHelper {
 
     public static boolean itemMatches(ItemStack a, ItemStack b) {
         return ItemStack.isSameItemSameComponents(a, b);
+    }
+
+    public static boolean fluidMatches(FluidStack a, FluidStack b) {
+        return FluidStack.isSameFluidSameComponents(a, b);
     }
 
     public static boolean isBrewingIngredient(ItemStack stack, Level level) {
