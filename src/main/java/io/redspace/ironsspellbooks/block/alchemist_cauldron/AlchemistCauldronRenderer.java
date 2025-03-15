@@ -4,6 +4,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import io.redspace.ironsspellbooks.IronsSpellbooks;
+import io.redspace.ironsspellbooks.fluids.ICauldronColoredFluid;
 import io.redspace.ironsspellbooks.render.RenderHelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -224,10 +225,9 @@ public class AlchemistCauldronRenderer implements BlockEntityRenderer<AlchemistC
         for (FluidStack fluid : tile.fluidInventory.fluids()) {
             int k = waterColor;
 
-            // fixme: alchemist cauldron 2 (blood hardcode n stuff)
-            IClientFluidTypeExtensions clientFluid = IClientFluidTypeExtensions.of(fluid.getFluid());
-            if (clientFluid.getTintColor() != 0xFFFFFFFF) {
-                k = clientFluid.getTintColor();
+            ICauldronColoredFluid clientFluid = ICauldronColoredFluid.of(IClientFluidTypeExtensions.of(fluid.getFluid()));
+            if (clientFluid.getColor() != 0xFFFFFFFF) {
+                k = clientFluid.getColor();
             }
             f += (float) ((k >> 16 & 255)) / 255.0F;
             f1 += (float) ((k >> 8 & 255)) / 255.0F;
