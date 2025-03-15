@@ -1,4 +1,4 @@
-// 1.21.1	2025-02-27T18:52:09.0496952	Recipes
+// 1.21.1	2025-03-15T18:40:29.4133636	Recipes
 5684a9bb618e3b2c2a96dbcb830c5df276de6a27 data/irons_spellbooks/advancement/recipes/misc/affinity_ring.json
 e4a59ea817a6944398503bc85ca3f045e7042510 data/irons_spellbooks/advancement/recipes/misc/cast_time_ring.json
 66ff6686b91a38a9d76a55ac2c0d8ac17148201a data/irons_spellbooks/advancement/recipes/misc/concentration_amulet.json
@@ -12,6 +12,7 @@ b6dc1d4fc843d0580e6693017255840bb93a1f4e data/irons_spellbooks/advancement/recip
 b34b879eead94f93ec2b567cac38ff833f1e05b8 data/irons_spellbooks/advancement/recipes/misc/poisonward_ring.json
 a48ba2877f2d76701bd06d5fff991fef30055e20 data/irons_spellbooks/advancement/recipes/misc/visibility_ring.json
 e6eed7cdd574ae03b22c38b260a3156a997b6f49 data/irons_spellbooks/recipe/affinity_ring.json
+55c288e8857d5fadd7bcb12806f9a5f3d1ff5e75 data/irons_spellbooks/recipe/alchemist_cauldron/fill_blood.json
 b2424464c03f168f4a0c1e3589f147b693fff82e data/irons_spellbooks/recipe/cast_time_ring.json
 e42b780ef39e05ca81a43885dd3d68e3b94d8363 data/irons_spellbooks/recipe/concentration_amulet.json
 acd871661e749420e6ad8db7ffe6315a5a13345f data/irons_spellbooks/recipe/conjurers_talisman.json

@@ -9,6 +9,7 @@ import io.redspace.ironsspellbooks.config.ServerConfigs;
 import io.redspace.ironsspellbooks.item.InkItem;
 import io.redspace.ironsspellbooks.registries.BlockRegistry;
 import io.redspace.ironsspellbooks.registries.ItemRegistry;
+import io.redspace.ironsspellbooks.registries.RecipeRegistry;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.Util;
 import net.minecraft.core.*;
@@ -19,6 +20,7 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.TagKey;
@@ -31,6 +33,7 @@ import net.minecraft.world.item.ItemUtils;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.item.alchemy.Potions;
+import net.minecraft.world.item.crafting.SingleRecipeInput;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -217,16 +220,8 @@ public class AlchemistCauldronTile extends BlockEntity implements WorldlyContain
         }
     }
 
-    /*
-    Cauldron Interaction Doctrine:
-    - Placing in an input item should always replace a liquid item when brewed (or not brew at all)
-        - Scroll: replace water for ink
-        - Potion Reagent: replace previous potion for next potion
-        - Elixir Crafting: consume previous liquid items, produce new liquid item
-    - Emptying a liquid into the cauldron should always increase the level, and extracting a liquid item should decrease it (the level should be strictly tied to the amount of liquid item present)
-     */
     public static int INPUT_SIZE = 4;
-    public static final Object2ObjectOpenHashMap<Item, AlchemistCauldronInteraction> INTERACTIONS = AlchemistCauldronTile.newInteractionMap();
+    //    public static final Object2ObjectOpenHashMap<Item, AlchemistCauldronInteraction> INTERACTIONS = AlchemistCauldronTile.newInteractionMap();
     public final NonNullList<ItemStack> inputItems = NonNullList.withSize(INPUT_SIZE, ItemStack.EMPTY);
     private final int[] cooktimes = new int[INPUT_SIZE];
     boolean capDirty;
@@ -274,13 +269,26 @@ public class AlchemistCauldronTile extends BlockEntity implements WorldlyContain
 
     public ItemInteractionResult handleUse(BlockState blockState, Level level, BlockPos pos, Player player, InteractionHand hand) {
         ItemStack itemStack = player.getItemInHand(hand);
-        if (level.getBlockEntity(pos) instanceof AlchemistCauldronTile tile) {
-            var cauldronInteractionResult = INTERACTIONS.get(itemStack.getItem()).interact(tile, blockState, level, pos, itemStack);
-            if (cauldronInteractionResult != null) {
-                player.setItemInHand(hand, ItemUtils.createFilledResult(itemStack, player, cauldronInteractionResult));
-                this.setChanged();
-                return ItemInteractionResult.sidedSuccess(level.isClientSide);
-            } else if (isValidInput(itemStack)) {
+        SingleRecipeInput recipeInput = new SingleRecipeInput(itemStack);
+        if (level instanceof ServerLevel serverLevel) {
+            var fillRecipe = serverLevel.getRecipeManager().getRecipeFor(RecipeRegistry.ALCHEMIST_CAULDRON_FILL_TYPE.get(), recipeInput, serverLevel);
+            if (fillRecipe.isPresent()) {
+                var recipe = fillRecipe.get().value();
+                if (fluidInventory.fill(recipe.result(), IFluidHandler.FluidAction.SIMULATE) == recipe.result().getAmount()) {
+                    player.setItemInHand(hand, ItemUtils.createFilledResult(itemStack, player, fillRecipe.get().value().assemble(recipeInput, serverLevel.registryAccess())));
+                    fluidInventory.fill(recipe.result(), IFluidHandler.FluidAction.EXECUTE);
+                    this.setChanged();
+                    return ItemInteractionResult.sidedSuccess(level.isClientSide);
+                }
+            }
+//            if (cauldronInteractionResult != null) {
+//                player.setItemInHand(hand, ItemUtils.createFilledResult(itemStack, player, cauldronInteractionResult));
+//                this.setChanged();
+//                return ItemInteractionResult.sidedSuccess(level.isClientSide);
+//            }
+
+            // item input
+            else if (isValidInput(itemStack)) {
                 if (!level.isClientSide) {
                     for (int i = 0; i < inputItems.size(); i++) {
                         var stack = inputItems.get(i);
@@ -314,6 +322,7 @@ public class AlchemistCauldronTile extends BlockEntity implements WorldlyContain
                 }
             }
         }
+        //fixme: client desync here
         return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
     }
 

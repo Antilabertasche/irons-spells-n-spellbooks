@@ -1,5 +1,8 @@
 package io.redspace.ironsspellbooks.datagen;
 
+import io.redspace.ironsspellbooks.IronsSpellbooks;
+import io.redspace.ironsspellbooks.recipe_types.alchemist_cauldron.filling.FillAlchemistCauldronRecipe;
+import io.redspace.ironsspellbooks.registries.FluidRegistry;
 import io.redspace.ironsspellbooks.registries.ItemRegistry;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
@@ -33,7 +36,10 @@ public class IronRecipeProvider extends RecipeProvider {
         simpleRingSalvageRecipe(recipeOutput, ItemRegistry.AFFINITY_RING.get(), Ingredient.of(Items.BUCKET));
         simpleRingSalvageRecipe(recipeOutput, ItemRegistry.EXPULSION_RING.get(), Ingredient.of(Items.WIND_CHARGE));
         simpleRingSalvageRecipe(recipeOutput, ItemRegistry.VISIBILITY_RING.get(), Ingredient.of(Items.SPYGLASS));
-//        simpleNecklaceSalvageRecipe(recipeOutput, ItemRegistry.TELEPORTATION_AMULET.get(), Ingredient.of(Items.ENDER_PEARL), Ingredient.of(Items.CHAIN));
+
+        new FillAlchemistCauldronRecipe
+                .Builder(ItemRegistry.BLOOD_VIAL.get(), Items.GLASS_BOTTLE, FluidRegistry.BLOOD)
+                .save(recipeOutput, IronsSpellbooks.id("alchemist_cauldron/fill_blood"));
     }
 
     protected void simpleRingSalvageRecipe(RecipeOutput output, Item result, Ingredient modifier) {
