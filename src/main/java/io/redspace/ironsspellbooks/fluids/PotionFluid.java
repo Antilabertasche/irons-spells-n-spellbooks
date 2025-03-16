@@ -8,6 +8,9 @@ import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.util.StringRepresentable;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.alchemy.PotionContents;
 import net.neoforged.neoforge.fluids.BaseFlowingFluid;
 import net.neoforged.neoforge.fluids.FluidStack;
@@ -35,6 +38,32 @@ public class PotionFluid extends NoopFluid {
             fs.set(DataComponents.POTION_CONTENTS, potionContents);
             return fs;
         }
+    }
+
+    public static FluidStack from(ItemStack stack) {
+        if (!stack.has(DataComponents.POTION_CONTENTS)) {
+            return FluidStack.EMPTY;
+        }
+        BottleType type = stack.is(Items.LINGERING_POTION) ? BottleType.LINGERING
+                : stack.is(Items.SPLASH_POTION) ? BottleType.SPLASH
+                : BottleType.REGULAR;
+        var fs = new FluidStack(FluidRegistry.POTION_FLUID, 250);
+        fs.set(DataComponents.POTION_CONTENTS, stack.get(DataComponents.POTION_CONTENTS));
+        fs.set(ComponentRegistry.POTION_BOTTLE_TYPE, type);
+        return fs;
+    }
+
+    public static ItemStack from(FluidStack stack) {
+        if (!stack.has(DataComponents.POTION_CONTENTS) || stack.getAmount() < 250) {
+            return ItemStack.EMPTY;
+        }
+        PotionFluid.BottleType type = stack.getOrDefault(ComponentRegistry.POTION_BOTTLE_TYPE, PotionFluid.BottleType.REGULAR);
+        Item item = type == BottleType.LINGERING ? Items.LINGERING_POTION
+                : type == BottleType.SPLASH ? Items.SPLASH_POTION
+                : Items.POTION;
+        var is = new ItemStack(item);
+        is.set(DataComponents.POTION_CONTENTS, stack.get(DataComponents.POTION_CONTENTS));
+        return is;
     }
 
     public enum BottleType implements StringRepresentable {

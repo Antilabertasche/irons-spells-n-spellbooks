@@ -6,8 +6,10 @@ import io.redspace.ironsspellbooks.api.spells.SpellRarity;
 import io.redspace.ironsspellbooks.api.util.Utils;
 import io.redspace.ironsspellbooks.capabilities.magic.MagicManager;
 import io.redspace.ironsspellbooks.config.ServerConfigs;
+import io.redspace.ironsspellbooks.fluids.PotionFluid;
 import io.redspace.ironsspellbooks.item.InkItem;
 import io.redspace.ironsspellbooks.recipe_types.alchemist_cauldron.EmptyAlchemistCauldronRecipe;
+import io.redspace.ironsspellbooks.recipe_types.alchemist_cauldron.FillAlchemistCauldronRecipe;
 import io.redspace.ironsspellbooks.registries.BlockRegistry;
 import io.redspace.ironsspellbooks.registries.ItemRegistry;
 import io.redspace.ironsspellbooks.registries.RecipeRegistry;
@@ -34,6 +36,7 @@ import net.minecraft.world.item.ItemUtils;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.item.alchemy.Potions;
+import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.SingleRecipeInput;
 import net.minecraft.world.level.Level;
@@ -53,6 +56,7 @@ import org.jetbrains.annotations.Nullable;
 import javax.annotation.Nonnull;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Supplier;
 
 public class AlchemistCauldronTile extends BlockEntity implements WorldlyContainer {
@@ -74,6 +78,7 @@ public class AlchemistCauldronTile extends BlockEntity implements WorldlyContain
          * If multiple fluids are present, each one gets exactly 1 tank.
          * Held capacity of all tanks combined should never exceed 1000mb
          */
+        //fixme: need stack structure, not array/list structure
         IFluidTank[] tanks = new IFluidTank[]{new CallbackFluidTank(1000), new CallbackFluidTank(1000), new CallbackFluidTank(1000), new CallbackFluidTank(1000)};
 
         @Override
@@ -273,17 +278,28 @@ public class AlchemistCauldronTile extends BlockEntity implements WorldlyContain
         ItemStack itemStack = player.getItemInHand(hand);
         SingleRecipeInput recipeInput = new SingleRecipeInput(itemStack);
         if (level instanceof ServerLevel serverLevel) {
-            var fillRecipe = serverLevel.getRecipeManager().getRecipeFor(RecipeRegistry.ALCHEMIST_CAULDRON_FILL_TYPE.get(), recipeInput, serverLevel);
+            var fillRecipe = serverLevel.getRecipeManager().getRecipeFor(RecipeRegistry.ALCHEMIST_CAULDRON_FILL_TYPE.get(), recipeInput, serverLevel).map(RecipeHolder::value);
+            if (fillRecipe.isEmpty() && itemStack.has(DataComponents.POTION_CONTENTS)) {
+                // dynamic potion handling
+                FluidStack fluid;
+                if (itemStack.get(DataComponents.POTION_CONTENTS).is(Potions.WATER)) {
+                    fluid = new FluidStack(Fluids.WATER, 250);
+                } else {
+                    fluid = PotionFluid.from(itemStack);
+                }
+                fillRecipe = Optional.of(new FillAlchemistCauldronRecipe(Ingredient.of(itemStack), new ItemStack(Items.GLASS_BOTTLE), fluid, true));
+            }
             if (fillRecipe.isPresent()) {
-                var recipe = fillRecipe.get().value();
-                if (fluidInventory.fill(recipe.result(), IFluidHandler.FluidAction.SIMULATE) == recipe.result().getAmount()) {
-                    player.setItemInHand(hand, ItemUtils.createFilledResult(itemStack, player, fillRecipe.get().value().assemble(recipeInput, serverLevel.registryAccess())));
+                var recipe = fillRecipe.get();
+                if (!recipe.mustFitAll() || fluidInventory.fill(recipe.result(), IFluidHandler.FluidAction.SIMULATE) == recipe.result().getAmount()) {
+                    player.setItemInHand(hand, ItemUtils.createFilledResult(itemStack, player, recipe.assemble(recipeInput, serverLevel.registryAccess())));
                     fluidInventory.fill(recipe.result(), IFluidHandler.FluidAction.EXECUTE);
                     this.setChanged();
                     return ItemInteractionResult.sidedSuccess(level.isClientSide);
                 }
             }
             var emptyRecipes = serverLevel.getRecipeManager().getRecipesFor(RecipeRegistry.ALCHEMIST_CAULDRON_EMPTY_TYPE.get(), recipeInput, serverLevel);
+
             for (RecipeHolder<EmptyAlchemistCauldronRecipe> holder : emptyRecipes) {
                 var recipe = holder.value();
                 if (fluidInventory.contains(recipe.fluid(), recipe.fluid().getAmount())) {
@@ -291,6 +307,27 @@ public class AlchemistCauldronTile extends BlockEntity implements WorldlyContain
                     fluidInventory.drain(recipe.fluid(), IFluidHandler.FluidAction.EXECUTE);
                     this.setChanged();
                     return ItemInteractionResult.sidedSuccess(level.isClientSide);
+                }
+            }
+            if (itemStack.is(Items.GLASS_BOTTLE)) {
+                //dynamic potion handling
+                for (FluidStack fluidStack : fluidInventory.fluids()) {
+                    if (fluidStack.is(Fluids.WATER)) {
+                        if (fluidStack.getAmount() >= 250) {
+                            player.setItemInHand(hand, ItemUtils.createFilledResult(itemStack, player, Utils.setPotion(new ItemStack(Items.POTION), Potions.WATER)));
+                            fluidInventory.drain(fluidStack.copyWithAmount(250), IFluidHandler.FluidAction.EXECUTE);
+                            this.setChanged();
+                            return ItemInteractionResult.sidedSuccess(level.isClientSide);
+                        }
+                    } else if (fluidStack.has(DataComponents.POTION_CONTENTS)) {
+                        var potionStack = PotionFluid.from(fluidStack);
+                        if (!potionStack.isEmpty()) {
+                            player.setItemInHand(hand, ItemUtils.createFilledResult(itemStack, player, potionStack));
+                            fluidInventory.drain(fluidStack.copyWithAmount(250), IFluidHandler.FluidAction.EXECUTE);
+                            this.setChanged();
+                            return ItemInteractionResult.sidedSuccess(level.isClientSide);
+                        }
+                    }
                 }
             }
 //            if (cauldronInteractionResult != null) {
@@ -335,7 +372,7 @@ public class AlchemistCauldronTile extends BlockEntity implements WorldlyContain
             }
         }
         //fixme: client desync here
-        return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+        return ItemInteractionResult.CONSUME;
     }
 
 //    protected boolean isBaseIngredientPresent(FluidStack stack) {

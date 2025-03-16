@@ -13,10 +13,13 @@ import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.data.recipes.RecipeProvider;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.material.Fluid;
+import net.minecraft.world.level.material.Fluids;
 import net.neoforged.neoforge.common.Tags;
+import net.neoforged.neoforge.fluids.FluidStack;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -46,18 +49,32 @@ public class IronRecipeProvider extends RecipeProvider {
         cauldronBottledInteraction(recipeOutput, ItemRegistry.INK_RARE, FluidRegistry.RARE_INK);
         cauldronBottledInteraction(recipeOutput, ItemRegistry.INK_EPIC, FluidRegistry.EPIC_INK);
         cauldronBottledInteraction(recipeOutput, ItemRegistry.INK_LEGENDARY, FluidRegistry.LEGENDARY_INK);
+        // fixme: modded buckets, even with water, wont work
+        new FillAlchemistCauldronRecipe
+                .Builder(Ingredient.of(Items.WATER_BUCKET), new ItemStack(Items.BUCKET), new FluidStack(Fluids.WATER, 1000), false)
+                .save(recipeOutput, IronsSpellbooks.id("alchemist_cauldron/fill_water_bucket"));
+        new EmptyAlchemistCauldronRecipe
+                .Builder(Ingredient.of(Items.BUCKET), new ItemStack(Items.WATER_BUCKET), new FluidStack(Fluids.WATER, 1000))
+                .save(recipeOutput, IronsSpellbooks.id("alchemist_cauldron/empty_water_bucket"));
     }
 
     /**
      * creates recipe for filling the cauldron via this item, and emptying the cauldron to this item, via a glass bottle
      */
     protected void cauldronBottledInteraction(RecipeOutput output, Holder<Item> item, Holder<Fluid> fluid) {
+        cauldronTwoWayInteraction(output, item, Holder.direct(Items.GLASS_BOTTLE), fluid, 250);
+    }
+
+    /**
+     * creates recipe for filling the cauldron via this item, and emptying the cauldron to this item
+     */
+    protected void cauldronTwoWayInteraction(RecipeOutput output, Holder<Item> item, Holder<Item> vessel, Holder<Fluid> fluid, int amount) {
         String name = item.unwrapKey().map(key -> key.location().getPath()).orElse("empty");
         new FillAlchemistCauldronRecipe
-                .Builder(item.value(), Items.GLASS_BOTTLE, fluid)
+                .Builder(item.value(), vessel.value(), fluid, amount)
                 .save(output, IronsSpellbooks.id("alchemist_cauldron/fill_" + name));
         new EmptyAlchemistCauldronRecipe
-                .Builder(Items.GLASS_BOTTLE, item.value(), fluid)
+                .Builder(vessel.value(), item.value(), fluid, amount)
                 .save(output, IronsSpellbooks.id("alchemist_cauldron/empty_" + name));
     }
 

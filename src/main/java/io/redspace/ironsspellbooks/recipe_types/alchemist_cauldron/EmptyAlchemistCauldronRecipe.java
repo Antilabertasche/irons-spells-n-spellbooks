@@ -18,7 +18,9 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.material.Fluid;
 import net.neoforged.neoforge.fluids.FluidStack;
 import org.jetbrains.annotations.Nullable;
-
+/**
+ * Recipe Type for taking liquids out of the cauldron (emptying cauldron)
+ */
 public record EmptyAlchemistCauldronRecipe(Ingredient input, ItemStack result,
                                            FluidStack fluid) implements Recipe<SingleRecipeInput> {
     public ItemStack result() {
@@ -91,9 +93,10 @@ public record EmptyAlchemistCauldronRecipe(Ingredient input, ItemStack result,
 
     public record Builder(Ingredient input, ItemStack returned, FluidStack fluid) implements RecipeBuilder {
 
-        public Builder(Item input, Item returned, Holder<Fluid> fluid) {
-            this(Ingredient.of(input), new ItemStack(returned), new FluidStack(fluid, 250)); // 250 is standard bottle
+        public Builder(Item input, Item returned, Holder<Fluid> fluid, int amount) {
+            this(Ingredient.of(input), new ItemStack(returned), new FluidStack(fluid, amount));
         }
+
 
         @Override
         public RecipeBuilder unlockedBy(String name, Criterion<?> criterion) {
