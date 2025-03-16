@@ -226,8 +226,8 @@ public class AlchemistCauldronRenderer implements BlockEntityRenderer<AlchemistC
             int k = waterColor;
 
             ICauldronColoredFluid clientFluid = ICauldronColoredFluid.of(IClientFluidTypeExtensions.of(fluid.getFluid()));
-            if (clientFluid.getColor() != 0xFFFFFFFF) {
-                k = clientFluid.getColor();
+            if (clientFluid.getColor(fluid) != 0xFFFFFFFF) {
+                k = clientFluid.getColor(fluid);
             }
             int a = fluid.getAmount();
             f += (float) ((k >> 16 & 255)) / 255.0F * a;
