@@ -8,6 +8,7 @@ import io.redspace.ironsspellbooks.capabilities.magic.MagicManager;
 import io.redspace.ironsspellbooks.config.ServerConfigs;
 import io.redspace.ironsspellbooks.fluids.PotionFluid;
 import io.redspace.ironsspellbooks.item.InkItem;
+import io.redspace.ironsspellbooks.recipe_types.alchemist_cauldron.BrewAlchemistCauldronRecipe;
 import io.redspace.ironsspellbooks.recipe_types.alchemist_cauldron.EmptyAlchemistCauldronRecipe;
 import io.redspace.ironsspellbooks.recipe_types.alchemist_cauldron.FillAlchemistCauldronRecipe;
 import io.redspace.ironsspellbooks.registries.BlockRegistry;
@@ -99,6 +100,10 @@ public class AlchemistCauldronTile extends BlockEntity implements WorldlyContain
 
         public int fluidAmount() {
             return fluids().stream().mapToInt(FluidStack::getAmount).sum();
+        }
+
+        public boolean canFit(int fluidAmount) {
+            return fluidAmount + this.fluidAmount() <= 1000;
         }
 
         @Override
@@ -417,7 +422,7 @@ public class AlchemistCauldronTile extends BlockEntity implements WorldlyContain
 //    }
 
     public void tryMeltInput(ItemStack itemStack) {
-        if (level == null || level.isClientSide) {
+        if (level == null || !(level instanceof ServerLevel serverLevel)) {
             return;
         }
         /** shouldMelt is whether the input should be consumed*/
@@ -432,6 +437,23 @@ public class AlchemistCauldronTile extends BlockEntity implements WorldlyContain
                 success = false;
             }
             shouldMelt = true;
+        }
+        if (!shouldMelt) {
+            for (FluidStack fluid : fluidInventory.fluids()) {
+                BrewAlchemistCauldronRecipe.Input input = new BrewAlchemistCauldronRecipe.Input(fluid, itemStack);
+                var brewRecipeOpt = serverLevel.getRecipeManager().getRecipeFor(RecipeRegistry.ALCHEMIST_CAULDRON_BREW_TYPE.get(), input, serverLevel).map(RecipeHolder::value);
+                if (brewRecipeOpt.isPresent()) {
+                    var recipe = brewRecipeOpt.get();
+                    int totalNewFluid = recipe.results().stream().mapToInt(FluidStack::getAmount).sum();
+                    if (fluidInventory.canFit(totalNewFluid - recipe.fluidIn().getAmount()) && fluidInventory.contains(recipe.fluidIn(), recipe.fluidIn().getAmount())) {
+                        shouldMelt = true; // marks reagent item for consumption
+                        fluidInventory.drain(recipe.fluidIn(), IFluidHandler.FluidAction.EXECUTE);
+                        recipe.results().forEach(result ->
+                                fluidInventory.fill(result, IFluidHandler.FluidAction.EXECUTE)
+                        );
+                    }
+                }
+            }
         }
 //        if (!shouldMelt && isBrewable(itemStack)) {
 //            for (int i = 0; i < outputItems.size(); i++) {
@@ -497,7 +519,8 @@ public class AlchemistCauldronTile extends BlockEntity implements WorldlyContain
      Cauldron Helpers
      ***********************************************************/
     public boolean isValidInput(ItemStack itemStack) {
-        return itemStack.is(ItemRegistry.SCROLL.get()) || isBrewable(itemStack) || AlchemistCauldronRecipeRegistry.isValidIngredient(itemStack);
+        //fixme: alchemist cauldron 2 stuff
+        return itemStack.is(ItemRegistry.SCROLL.get()) || isBrewable(itemStack) || true;// AlchemistCauldronRecipeRegistry.isValidIngredient(itemStack);
     }
 
     public boolean isBrewable(ItemStack itemStack) {

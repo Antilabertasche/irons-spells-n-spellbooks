@@ -115,7 +115,7 @@ public record FillAlchemistCauldronRecipe(Ingredient input, ItemStack returned,
 
         @Override
         public Item getResult() {
-            return null;
+            return returned.getItem();
         }
 
         @Override

@@ -1,4 +1,4 @@
-// 1.21.1	2025-03-15T20:05:40.3302777	Recipes
+// 1.21.1	2025-03-15T21:01:05.7248176	Recipes
 5684a9bb618e3b2c2a96dbcb830c5df276de6a27 data/irons_spellbooks/advancement/recipes/misc/affinity_ring.json
 e4a59ea817a6944398503bc85ca3f045e7042510 data/irons_spellbooks/advancement/recipes/misc/cast_time_ring.json
 66ff6686b91a38a9d76a55ac2c0d8ac17148201a data/irons_spellbooks/advancement/recipes/misc/concentration_amulet.json
@@ -12,6 +12,10 @@ b6dc1d4fc843d0580e6693017255840bb93a1f4e data/irons_spellbooks/advancement/recip
 b34b879eead94f93ec2b567cac38ff833f1e05b8 data/irons_spellbooks/advancement/recipes/misc/poisonward_ring.json
 a48ba2877f2d76701bd06d5fff991fef30055e20 data/irons_spellbooks/advancement/recipes/misc/visibility_ring.json
 e6eed7cdd574ae03b22c38b260a3156a997b6f49 data/irons_spellbooks/recipe/affinity_ring.json
+8bf7b57cc3951e879427489b28d3a4bdded6ed93 data/irons_spellbooks/recipe/alchemist_cauldron/brew_epic_ink.json
+a7dc9baefe632f9d32519e0b8ba510bbc88e5be3 data/irons_spellbooks/recipe/alchemist_cauldron/brew_legendary_ink.json
+0037a59f6dd5594dfea803ba2dda3fafbf3cd90d data/irons_spellbooks/recipe/alchemist_cauldron/brew_rare_ink.json
+de5589861d22e46370a24c03940de616582b02ff data/irons_spellbooks/recipe/alchemist_cauldron/brew_uncommon_ink.json
 5c2dbc48c85fe18fd23491fae13d42644745209a data/irons_spellbooks/recipe/alchemist_cauldron/empty_blood_vial.json
 1933dc5dcda61b34f0c7abb4d95e3d09dcbc4691 data/irons_spellbooks/recipe/alchemist_cauldron/empty_common_ink.json
 49cdeb27ec823eb0bd860c1f6f19228ab96d7759 data/irons_spellbooks/recipe/alchemist_cauldron/empty_epic_ink.json

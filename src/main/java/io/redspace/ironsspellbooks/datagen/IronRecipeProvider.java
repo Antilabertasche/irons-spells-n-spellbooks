@@ -1,6 +1,7 @@
 package io.redspace.ironsspellbooks.datagen;
 
 import io.redspace.ironsspellbooks.IronsSpellbooks;
+import io.redspace.ironsspellbooks.recipe_types.alchemist_cauldron.BrewAlchemistCauldronRecipe;
 import io.redspace.ironsspellbooks.recipe_types.alchemist_cauldron.EmptyAlchemistCauldronRecipe;
 import io.redspace.ironsspellbooks.recipe_types.alchemist_cauldron.FillAlchemistCauldronRecipe;
 import io.redspace.ironsspellbooks.registries.FluidRegistry;
@@ -56,6 +57,31 @@ public class IronRecipeProvider extends RecipeProvider {
         new EmptyAlchemistCauldronRecipe
                 .Builder(Ingredient.of(Items.BUCKET), new ItemStack(Items.WATER_BUCKET), new FluidStack(Fluids.WATER, 1000))
                 .save(recipeOutput, IronsSpellbooks.id("alchemist_cauldron/empty_water_bucket"));
+
+        // Upgrade common ink -> uncommon
+        BrewAlchemistCauldronRecipe.builder()
+                .withInput(FluidRegistry.COMMON_INK, 1000)
+                .withReagent(Tags.Items.INGOTS_COPPER)
+                .withResult(FluidRegistry.UNCOMMON_INK, 250)
+                .save(recipeOutput);
+        // Upgrade uncommon ink -> rare
+        BrewAlchemistCauldronRecipe.builder()
+                .withInput(FluidRegistry.UNCOMMON_INK, 1000)
+                .withReagent(Tags.Items.INGOTS_IRON)
+                .withResult(FluidRegistry.RARE_INK, 250)
+                .save(recipeOutput);
+        // Upgrade rare ink -> epic
+        BrewAlchemistCauldronRecipe.builder()
+                .withInput(FluidRegistry.RARE_INK, 1000)
+                .withReagent(Tags.Items.INGOTS_GOLD)
+                .withResult(FluidRegistry.EPIC_INK, 250)
+                .save(recipeOutput);
+        // Upgrade epic ink -> legendary
+        BrewAlchemistCauldronRecipe.builder()
+                .withInput(FluidRegistry.EPIC_INK, 1000)
+                .withReagent(Tags.Items.GEMS_AMETHYST)
+                .withResult(FluidRegistry.LEGENDARY_INK, 250)
+                .save(recipeOutput);
     }
 
     /**
