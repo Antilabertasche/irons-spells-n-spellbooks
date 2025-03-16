@@ -229,10 +229,11 @@ public class AlchemistCauldronRenderer implements BlockEntityRenderer<AlchemistC
             if (clientFluid.getColor() != 0xFFFFFFFF) {
                 k = clientFluid.getColor();
             }
-            f += (float) ((k >> 16 & 255)) / 255.0F;
-            f1 += (float) ((k >> 8 & 255)) / 255.0F;
-            f2 += (float) ((k >> 0 & 255)) / 255.0F;
-            i++;
+            int a = fluid.getAmount();
+            f += (float) ((k >> 16 & 255)) / 255.0F * a;
+            f1 += (float) ((k >> 8 & 255)) / 255.0F * a;
+            f2 += (float) ((k >> 0 & 255)) / 255.0F * a;
+            i += a;
         }
 
         f = f / (float) i * 255.0F;
