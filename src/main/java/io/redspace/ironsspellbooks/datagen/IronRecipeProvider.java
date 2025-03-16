@@ -1,11 +1,13 @@
 package io.redspace.ironsspellbooks.datagen;
 
 import io.redspace.ironsspellbooks.IronsSpellbooks;
+import io.redspace.ironsspellbooks.fluids.PotionFluid;
 import io.redspace.ironsspellbooks.recipe_types.alchemist_cauldron.BrewAlchemistCauldronRecipe;
 import io.redspace.ironsspellbooks.recipe_types.alchemist_cauldron.EmptyAlchemistCauldronRecipe;
 import io.redspace.ironsspellbooks.recipe_types.alchemist_cauldron.FillAlchemistCauldronRecipe;
 import io.redspace.ironsspellbooks.registries.FluidRegistry;
 import io.redspace.ironsspellbooks.registries.ItemRegistry;
+import io.redspace.ironsspellbooks.registries.PotionRegistry;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
@@ -16,6 +18,7 @@ import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.alchemy.Potions;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
@@ -50,6 +53,14 @@ public class IronRecipeProvider extends RecipeProvider {
         cauldronBottledInteraction(recipeOutput, ItemRegistry.INK_RARE, FluidRegistry.RARE_INK);
         cauldronBottledInteraction(recipeOutput, ItemRegistry.INK_EPIC, FluidRegistry.EPIC_INK);
         cauldronBottledInteraction(recipeOutput, ItemRegistry.INK_LEGENDARY, FluidRegistry.LEGENDARY_INK);
+        cauldronBottledInteraction(recipeOutput, ItemRegistry.OAKSKIN_ELIXIR, FluidRegistry.OAKSKIN_ELIXIR_FLUID);
+        cauldronBottledInteraction(recipeOutput, ItemRegistry.GREATER_OAKSKIN_ELIXIR, FluidRegistry.GREATER_OAKSKIN_ELIXIR_FLUID);
+        cauldronBottledInteraction(recipeOutput, ItemRegistry.EVASION_ELIXIR, FluidRegistry.EVASION_ELIXIR_FLUID);
+        cauldronBottledInteraction(recipeOutput, ItemRegistry.GREATER_EVASION_ELIXIR, FluidRegistry.GREATER_EVASION_ELIXIR_FLUID);
+        cauldronBottledInteraction(recipeOutput, ItemRegistry.INVISIBILITY_ELIXIR, FluidRegistry.INVISIBILITY_ELIXIR_FLUID);
+        cauldronBottledInteraction(recipeOutput, ItemRegistry.GREATER_INVISIBILITY_ELIXIR, FluidRegistry.GREATER_INVISIBILITY_ELIXIR_FLUID);
+        cauldronBottledInteraction(recipeOutput, ItemRegistry.GREATER_HEALING_POTION, FluidRegistry.GREATER_HEALING_ELIXIR_FLUID);
+
         // fixme: modded buckets, even with water, wont work
         new FillAlchemistCauldronRecipe
                 .Builder(Ingredient.of(Items.WATER_BUCKET), new ItemStack(Items.BUCKET), new FluidStack(Fluids.WATER, 1000), false)
@@ -81,6 +92,47 @@ public class IronRecipeProvider extends RecipeProvider {
                 .withInput(FluidRegistry.EPIC_INK, 1000)
                 .withReagent(Tags.Items.GEMS_AMETHYST)
                 .withResult(FluidRegistry.LEGENDARY_INK, 250)
+                .save(recipeOutput);
+
+        //Elixir Recipes
+        //oakskin
+        BrewAlchemistCauldronRecipe.builder()
+                .withInput(PotionFluid.of(500, Potions.STRONG_HEALING, PotionFluid.BottleType.REGULAR))
+                .withReagent(Items.OAK_LOG)
+                .withResult(FluidRegistry.OAKSKIN_ELIXIR_FLUID, 250)
+                .save(recipeOutput);
+        BrewAlchemistCauldronRecipe.builder()
+                .withInput(FluidRegistry.OAKSKIN_ELIXIR_FLUID, 500)
+                .withReagent(Items.AMETHYST_SHARD)
+                .withResult(FluidRegistry.GREATER_OAKSKIN_ELIXIR_FLUID, 250)
+                .save(recipeOutput);
+        //evasion
+        BrewAlchemistCauldronRecipe.builder()
+                .withInput(PotionFluid.of(1000, PotionRegistry.INSTANT_MANA_THREE, PotionFluid.BottleType.REGULAR))
+                .withReagent(Items.ENDER_PEARL)
+                .withResult(FluidRegistry.EVASION_ELIXIR_FLUID, 250)
+                .save(recipeOutput);
+        BrewAlchemistCauldronRecipe.builder()
+                .withInput(FluidRegistry.EVASION_ELIXIR_FLUID, 250)
+                .withReagent(Items.DRAGON_BREATH)
+                .withResult(FluidRegistry.GREATER_EVASION_ELIXIR_FLUID, 250)
+                .save(recipeOutput);
+        //invisibility
+        BrewAlchemistCauldronRecipe.builder()
+                .withInput(PotionFluid.of(1000, Potions.LONG_INVISIBILITY, PotionFluid.BottleType.REGULAR))
+                .withReagent(ItemRegistry.SHRIVING_STONE.get())
+                .withResult(FluidRegistry.INVISIBILITY_ELIXIR_FLUID, 250)
+                .save(recipeOutput);
+        BrewAlchemistCauldronRecipe.builder()
+                .withInput(FluidRegistry.INVISIBILITY_ELIXIR_FLUID, 250)
+                .withReagent(Items.AMETHYST_CLUSTER)
+                .withResult(FluidRegistry.GREATER_INVISIBILITY_ELIXIR_FLUID, 250)
+                .save(recipeOutput);
+        // healing
+        BrewAlchemistCauldronRecipe.builder()
+                .withInput(PotionFluid.of(1000, Potions.STRONG_HEALING, PotionFluid.BottleType.REGULAR))
+                .withReagent(Items.AMETHYST_SHARD)
+                .withResult(FluidRegistry.GREATER_HEALING_ELIXIR_FLUID, 250)
                 .save(recipeOutput);
     }
 

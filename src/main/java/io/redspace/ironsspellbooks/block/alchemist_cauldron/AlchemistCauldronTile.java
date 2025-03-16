@@ -520,7 +520,7 @@ public class AlchemistCauldronTile extends BlockEntity implements WorldlyContain
      ***********************************************************/
     public boolean isValidInput(ItemStack itemStack) {
         //fixme: alchemist cauldron 2 stuff
-        return itemStack.is(ItemRegistry.SCROLL.get()) || isBrewable(itemStack) || true;// AlchemistCauldronRecipeRegistry.isValidIngredient(itemStack);
+        return itemStack.is(ItemRegistry.SCROLL.get()) || isBrewable(itemStack) || !itemStack.isEmpty();// AlchemistCauldronRecipeRegistry.isValidIngredient(itemStack);
     }
 
     public boolean isBrewable(ItemStack itemStack) {

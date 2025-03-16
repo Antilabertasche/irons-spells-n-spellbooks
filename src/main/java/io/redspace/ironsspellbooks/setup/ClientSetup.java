@@ -110,6 +110,7 @@ import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
+import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.CrossbowItem;
@@ -148,6 +149,14 @@ public class ClientSetup {
         event.registerFluidType(new SimpleTintedClientFluidType(ResourceLocation.fromNamespaceAndPath("neoforge", "block/milk_still"), 0xFFa52ea0), FluidRegistry.EPIC_INK_TYPE);
         event.registerFluidType(new SimpleTintedClientFluidType(ResourceLocation.fromNamespaceAndPath("neoforge", "block/milk_still"), 0xFFfcaf1c), FluidRegistry.LEGENDARY_INK_TYPE);
         event.registerFluidType(new PotionClientFluidType(ResourceLocation.withDefaultNamespace("block/water_still")), FluidRegistry.POTION_FLUID_TYPE);
+
+        event.registerFluidType(new SimpleTintedClientFluidType(ResourceLocation.withDefaultNamespace("block/water_still"), MobEffectRegistry.OAKSKIN.get().getColor()), FluidRegistry.OAKSKIN_ELIXIR_TYPE);
+        event.registerFluidType(new SimpleTintedClientFluidType(ResourceLocation.withDefaultNamespace("block/water_still"), MobEffectRegistry.OAKSKIN.get().getColor()), FluidRegistry.GREATER_OAKSKIN_ELIXIR_TYPE);
+        event.registerFluidType(new SimpleTintedClientFluidType(ResourceLocation.withDefaultNamespace("block/water_still"), MobEffectRegistry.EVASION.get().getColor()), FluidRegistry.EVASION_ELIXIR_TYPE);
+        event.registerFluidType(new SimpleTintedClientFluidType(ResourceLocation.withDefaultNamespace("block/water_still"), MobEffectRegistry.EVASION.get().getColor()), FluidRegistry.GREATER_EVASION_ELIXIR_TYPE);
+        event.registerFluidType(new SimpleTintedClientFluidType(ResourceLocation.withDefaultNamespace("block/water_still"), MobEffectRegistry.TRUE_INVISIBILITY.get().getColor()), FluidRegistry.INVISIBILITY_ELIXIR_TYPE);
+        event.registerFluidType(new SimpleTintedClientFluidType(ResourceLocation.withDefaultNamespace("block/water_still"), MobEffectRegistry.TRUE_INVISIBILITY.get().getColor()), FluidRegistry.GREATER_INVISIBILITY_ELIXIR_TYPE);
+        event.registerFluidType(new SimpleTintedClientFluidType(ResourceLocation.withDefaultNamespace("block/water_still"), MobEffects.HEAL.value().getColor()), FluidRegistry.GREATER_HEALING_ELIXIR_TYPE);
     }
 
     @SubscribeEvent

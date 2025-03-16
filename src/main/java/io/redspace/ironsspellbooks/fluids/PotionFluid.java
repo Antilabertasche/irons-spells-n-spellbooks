@@ -4,6 +4,7 @@ import com.mojang.serialization.Codec;
 import io.netty.buffer.ByteBuf;
 import io.redspace.ironsspellbooks.registries.ComponentRegistry;
 import io.redspace.ironsspellbooks.registries.FluidRegistry;
+import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -11,6 +12,7 @@ import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.alchemy.Potion;
 import net.minecraft.world.item.alchemy.PotionContents;
 import net.neoforged.neoforge.fluids.BaseFlowingFluid;
 import net.neoforged.neoforge.fluids.FluidStack;
@@ -28,6 +30,10 @@ public class PotionFluid extends NoopFluid {
         addPotionToFluidStack(fluidStack, potionContents);
         fluidStack.set(ComponentRegistry.POTION_BOTTLE_TYPE, bottleType);
         return fluidStack;
+    }
+
+    public static FluidStack of(int amount, Holder<Potion> potion, BottleType bottleType) {
+        return of(amount, new PotionContents(potion), bottleType);
     }
 
     public static FluidStack addPotionToFluidStack(FluidStack fs, PotionContents potionContents) {
