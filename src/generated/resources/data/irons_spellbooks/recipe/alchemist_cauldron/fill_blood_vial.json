@@ -7,7 +7,7 @@
   "input": {
     "item": "irons_spellbooks:blood_vial"
   },
-  "returned": {
+  "result": {
     "count": 1,
     "id": "minecraft:glass_bottle"
   }

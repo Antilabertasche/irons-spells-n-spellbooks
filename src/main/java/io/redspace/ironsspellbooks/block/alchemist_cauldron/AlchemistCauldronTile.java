@@ -7,6 +7,7 @@ import io.redspace.ironsspellbooks.api.util.Utils;
 import io.redspace.ironsspellbooks.capabilities.magic.MagicManager;
 import io.redspace.ironsspellbooks.config.ServerConfigs;
 import io.redspace.ironsspellbooks.item.InkItem;
+import io.redspace.ironsspellbooks.recipe_types.alchemist_cauldron.EmptyAlchemistCauldronRecipe;
 import io.redspace.ironsspellbooks.registries.BlockRegistry;
 import io.redspace.ironsspellbooks.registries.ItemRegistry;
 import io.redspace.ironsspellbooks.registries.RecipeRegistry;
@@ -33,6 +34,7 @@ import net.minecraft.world.item.ItemUtils;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.alchemy.PotionContents;
 import net.minecraft.world.item.alchemy.Potions;
+import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.SingleRecipeInput;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -281,6 +283,16 @@ public class AlchemistCauldronTile extends BlockEntity implements WorldlyContain
                     return ItemInteractionResult.sidedSuccess(level.isClientSide);
                 }
             }
+            var emptyRecipes = serverLevel.getRecipeManager().getRecipesFor(RecipeRegistry.ALCHEMIST_CAULDRON_EMPTY_TYPE.get(), recipeInput, serverLevel);
+            for (RecipeHolder<EmptyAlchemistCauldronRecipe> holder : emptyRecipes) {
+                var recipe = holder.value();
+                if (fluidInventory.contains(recipe.fluid(), recipe.fluid().getAmount())) {
+                    player.setItemInHand(hand, ItemUtils.createFilledResult(itemStack, player, recipe.assemble(recipeInput, serverLevel.registryAccess())));
+                    fluidInventory.drain(recipe.fluid(), IFluidHandler.FluidAction.EXECUTE);
+                    this.setChanged();
+                    return ItemInteractionResult.sidedSuccess(level.isClientSide);
+                }
+            }
 //            if (cauldronInteractionResult != null) {
 //                player.setItemInHand(hand, ItemUtils.createFilledResult(itemStack, player, cauldronInteractionResult));
 //                this.setChanged();
@@ -288,7 +300,7 @@ public class AlchemistCauldronTile extends BlockEntity implements WorldlyContain
 //            }
 
             // item input
-            else if (isValidInput(itemStack)) {
+            if (isValidInput(itemStack)) {
                 if (!level.isClientSide) {
                     for (int i = 0; i < inputItems.size(); i++) {
                         var stack = inputItems.get(i);

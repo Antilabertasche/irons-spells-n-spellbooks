@@ -1,4 +1,4 @@
-package io.redspace.ironsspellbooks.recipe_types.alchemist_cauldron.filling;
+package io.redspace.ironsspellbooks.recipe_types.alchemist_cauldron;
 
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
@@ -19,8 +19,17 @@ import net.minecraft.world.level.material.Fluid;
 import net.neoforged.neoforge.fluids.FluidStack;
 import org.jetbrains.annotations.Nullable;
 
-public record FillAlchemistCauldronRecipe(Ingredient input, ItemStack returned,
-                                          FluidStack result) implements Recipe<SingleRecipeInput> {
+public record EmptyAlchemistCauldronRecipe(Ingredient input, ItemStack result,
+                                           FluidStack fluid) implements Recipe<SingleRecipeInput> {
+    public ItemStack result() {
+        return result.copy();
+    }
+
+    @Override
+    public FluidStack fluid() {
+        return fluid.copy();
+    }
+
     @Override
     public boolean matches(SingleRecipeInput input, Level level) {
         return this.input.test(input.item());
@@ -28,7 +37,7 @@ public record FillAlchemistCauldronRecipe(Ingredient input, ItemStack returned,
 
     @Override
     public ItemStack assemble(SingleRecipeInput input, HolderLookup.Provider registries) {
-        return returned.copy();
+        return result.copy();
     }
 
     @Override
@@ -43,39 +52,39 @@ public record FillAlchemistCauldronRecipe(Ingredient input, ItemStack returned,
 
     @Override
     public ItemStack getResultItem(HolderLookup.Provider registries) {
-        return returned.copy();
+        return result.copy();
     }
 
     @Override
     public RecipeSerializer<?> getSerializer() {
-        return RecipeRegistry.ALCHEMIST_CAULDRON_FILL_SERIALIZER.get();
+        return RecipeRegistry.ALCHEMIST_CAULDRON_EMPTY_SERIALIZER.get();
     }
 
     @Override
     public RecipeType<?> getType() {
-        return RecipeRegistry.ALCHEMIST_CAULDRON_FILL_TYPE.get();
+        return RecipeRegistry.ALCHEMIST_CAULDRON_EMPTY_TYPE.get();
     }
 
-    public static class Serializer implements RecipeSerializer<FillAlchemistCauldronRecipe> {
-        public static final MapCodec<FillAlchemistCauldronRecipe> CODEC = RecordCodecBuilder.mapCodec(builder -> builder.group(
-                Ingredient.CODEC.fieldOf("input").forGetter(FillAlchemistCauldronRecipe::input),
-                ItemStack.CODEC.fieldOf("returned").forGetter(FillAlchemistCauldronRecipe::returned),
-                FluidStack.CODEC.fieldOf("fluid").forGetter(FillAlchemistCauldronRecipe::result)
-        ).apply(builder, FillAlchemistCauldronRecipe::new));
-        public static final StreamCodec<RegistryFriendlyByteBuf, FillAlchemistCauldronRecipe> STREAM_CODEC = StreamCodec.composite(
-                Ingredient.CONTENTS_STREAM_CODEC, FillAlchemistCauldronRecipe::input,
-                ItemStack.STREAM_CODEC, FillAlchemistCauldronRecipe::returned,
-                FluidStack.STREAM_CODEC, FillAlchemistCauldronRecipe::result,
-                FillAlchemistCauldronRecipe::new
+    public static class Serializer implements RecipeSerializer<EmptyAlchemistCauldronRecipe> {
+        public static final MapCodec<EmptyAlchemistCauldronRecipe> CODEC = RecordCodecBuilder.mapCodec(builder -> builder.group(
+                Ingredient.CODEC.fieldOf("input").forGetter(EmptyAlchemistCauldronRecipe::input),
+                ItemStack.CODEC.fieldOf("result").forGetter(EmptyAlchemistCauldronRecipe::result),
+                FluidStack.CODEC.fieldOf("fluid").forGetter(EmptyAlchemistCauldronRecipe::fluid)
+        ).apply(builder, EmptyAlchemistCauldronRecipe::new));
+        public static final StreamCodec<RegistryFriendlyByteBuf, EmptyAlchemistCauldronRecipe> STREAM_CODEC = StreamCodec.composite(
+                Ingredient.CONTENTS_STREAM_CODEC, EmptyAlchemistCauldronRecipe::input,
+                ItemStack.STREAM_CODEC, EmptyAlchemistCauldronRecipe::result,
+                FluidStack.STREAM_CODEC, EmptyAlchemistCauldronRecipe::fluid,
+                EmptyAlchemistCauldronRecipe::new
         );
 
         @Override
-        public MapCodec<FillAlchemistCauldronRecipe> codec() {
+        public MapCodec<EmptyAlchemistCauldronRecipe> codec() {
             return CODEC;
         }
 
         @Override
-        public StreamCodec<RegistryFriendlyByteBuf, FillAlchemistCauldronRecipe> streamCodec() {
+        public StreamCodec<RegistryFriendlyByteBuf, EmptyAlchemistCauldronRecipe> streamCodec() {
             return STREAM_CODEC;
         }
     }
@@ -103,7 +112,7 @@ public record FillAlchemistCauldronRecipe(Ingredient input, ItemStack returned,
 
         @Override
         public void save(RecipeOutput recipeOutput, ResourceLocation id) {
-            recipeOutput.accept(id, new FillAlchemistCauldronRecipe(input, returned, fluid), null);
+            recipeOutput.accept(id, new EmptyAlchemistCauldronRecipe(input, returned, fluid), null);
         }
     }
 }

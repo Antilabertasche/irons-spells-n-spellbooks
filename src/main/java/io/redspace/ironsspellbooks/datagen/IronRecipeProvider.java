@@ -1,9 +1,11 @@
 package io.redspace.ironsspellbooks.datagen;
 
 import io.redspace.ironsspellbooks.IronsSpellbooks;
-import io.redspace.ironsspellbooks.recipe_types.alchemist_cauldron.filling.FillAlchemistCauldronRecipe;
+import io.redspace.ironsspellbooks.recipe_types.alchemist_cauldron.EmptyAlchemistCauldronRecipe;
+import io.redspace.ironsspellbooks.recipe_types.alchemist_cauldron.FillAlchemistCauldronRecipe;
 import io.redspace.ironsspellbooks.registries.FluidRegistry;
 import io.redspace.ironsspellbooks.registries.ItemRegistry;
+import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.RecipeCategory;
@@ -13,6 +15,7 @@ import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.level.material.Fluid;
 import net.neoforged.neoforge.common.Tags;
 
 import java.util.concurrent.CompletableFuture;
@@ -37,9 +40,20 @@ public class IronRecipeProvider extends RecipeProvider {
         simpleRingSalvageRecipe(recipeOutput, ItemRegistry.EXPULSION_RING.get(), Ingredient.of(Items.WIND_CHARGE));
         simpleRingSalvageRecipe(recipeOutput, ItemRegistry.VISIBILITY_RING.get(), Ingredient.of(Items.SPYGLASS));
 
+        cauldronBottledInteraction(recipeOutput, ItemRegistry.BLOOD_VIAL, FluidRegistry.BLOOD);
+    }
+
+    /**
+     * creates recipe for filling the cauldron via this item, and emptying the cauldron to this item, via a glass bottle
+     */
+    protected void cauldronBottledInteraction(RecipeOutput output, Holder<Item> item, Holder<Fluid> fluid) {
+        String name = item.unwrapKey().map(key -> key.location().getPath()).orElse("empty");
         new FillAlchemistCauldronRecipe
-                .Builder(ItemRegistry.BLOOD_VIAL.get(), Items.GLASS_BOTTLE, FluidRegistry.BLOOD)
-                .save(recipeOutput, IronsSpellbooks.id("alchemist_cauldron/fill_blood"));
+                .Builder(item.value(), Items.GLASS_BOTTLE, fluid)
+                .save(output, IronsSpellbooks.id("alchemist_cauldron/fill_" + name));
+        new EmptyAlchemistCauldronRecipe
+                .Builder(Items.GLASS_BOTTLE, item.value(), fluid)
+                .save(output, IronsSpellbooks.id("alchemist_cauldron/empty_" + name));
     }
 
     protected void simpleRingSalvageRecipe(RecipeOutput output, Item result, Ingredient modifier) {
